@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global styles */
+body {
+  @apply bg-primary text-white font-sans;
+}
+
+h1, h2, h3, h4 {
+  @apply font-bold text-secondary;
+}
+
+p {
+  @apply text-gray-300 leading-relaxed;
+}
+
+a {
+  @apply text-accent hover:underline transition;
+}
