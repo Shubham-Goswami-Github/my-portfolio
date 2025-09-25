@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Shubham-Goswami-Github/my-portfolio/static/css/main.69bdd63b.css",
+    "main.js": "/Shubham-Goswami-Github/my-portfolio/static/js/main.5a6db628.js",
+    "static/js/453.438d9e50.chunk.js": "/Shubham-Goswami-Github/my-portfolio/static/js/453.438d9e50.chunk.js",
+    "index.html": "/Shubham-Goswami-Github/my-portfolio/index.html",
+    "main.69bdd63b.css.map": "/Shubham-Goswami-Github/my-portfolio/static/css/main.69bdd63b.css.map",
+    "main.5a6db628.js.map": "/Shubham-Goswami-Github/my-portfolio/static/js/main.5a6db628.js.map",
+    "453.438d9e50.chunk.js.map": "/Shubham-Goswami-Github/my-portfolio/static/js/453.438d9e50.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.69bdd63b.css",
+    "static/js/main.5a6db628.js"
+  ]
+}
