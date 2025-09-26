@@ -1,28 +1,28 @@
 import { motion } from "framer-motion";
-import { 
-  SiHtml5, SiCss3, SiJavascript, SiC, SiMysql, SiPhp, SiPython,
-} from "react-icons/si";
 
 const skills = [
-  { name: "HTML", color: "from-orange-400 to-red-500", icon: <SiHtml5 size={50} /> },
-  { name: "CSS", color: "from-blue-400 to-indigo-600", icon: <SiCss3 size={50} /> },
-  { name: "JavaScript", color: "from-yellow-400 to-yellow-600", icon: <SiJavascript size={50} /> },
-  { name: "Java", color: "from-orange-500 to-red-600", icon: <SiCss3 size={50} /> },
-  { name: "C", color: "from-gray-400 to-gray-600", icon: <SiC size={50} /> },
-  { name: "MySQL", color: "from-cyan-400 to-cyan-700", icon: <SiMysql size={50} /> },
-  { name: "PHP", color: "from-purple-500 to-indigo-700", icon: <SiPhp size={50} /> },
-  { name: "Python", color: "from-blue-400 to-blue-700", icon: <SiPython size={50} /> },
+  { name: "HTML", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/html.png" },
+  { name: "CSS", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/CSS.png" },
+  { name: "JavaScript", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/javascript.png" },
+  { name: "Java", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/JAVA.png" },
+  { name: "C", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/CICON.png" },
+  { name: "MySQL", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/MYSQL-ICON.png" },
+  { name: "PHP", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/PHP.png" },
+  { name: "Python", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/pythone.png" },
 ];
 
 const Skills = () => {
   return (
     <section
       id="skills"
-      className="min-h-screen bg-gradient-to-b from-black to-primary px-6 py-24"
+      className="min-h-screen bg-gradient-to-b from-gray-100 via-white to-gray-200 
+                 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 
+                 px-6 py-24 transition-colors duration-500"
     >
       {/* Section Title */}
       <motion.h2
-        className="text-5xl md:text-6xl font-bold text-secondary text-center mb-20 tracking-wide"
+        className="text-5xl md:text-6xl font-bold text-[#e16928ff] dark:text-yellow-400 
+                   text-center mb-20 tracking-wide drop-shadow-lg"
         initial={{ opacity: 0, y: -50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -36,26 +36,37 @@ const Skills = () => {
         {skills.map((skill, index) => (
           <motion.div
             key={skill.name}
-            className={`p-10 rounded-3xl shadow-2xl text-center font-bold text-white bg-gradient-to-r ${skill.color} cursor-pointer flex flex-col items-center justify-center space-y-5 hover:scale-105 hover:rotate-2 hover:shadow-[0_25px_35px_rgba(0,0,0,0.6)] transition-transform duration-500`}
+            className="relative group p-8 rounded-3xl text-center font-bold 
+                       text-gray-900 dark:text-white cursor-pointer 
+                       flex flex-col items-center justify-center space-y-5
+                       bg-white/20 dark:bg-black/20 backdrop-blur-xl
+                       shadow-lg border border-gray-200 dark:border-gray-700
+                       hover:shadow-[0_0_25px_rgba(225,105,40,0.6)]
+                       transition-all duration-500"
             initial={{ opacity: 0, y: 60, scale: 0.8 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            whileHover={{ scale: 1.1, rotate: 3 }}
+            whileHover={{ scale: 1.08, rotate: 1 }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
             viewport={{ once: false }}
           >
-            {/* Icon */}
-            <motion.div
-              className="text-white"
+            {/* Glow background on hover */}
+            <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 
+                            bg-gradient-to-r from-[#e16928ff] to-yellow-400 blur-2xl transition-all duration-700"></div>
+
+            {/* Icon/Image */}
+            <motion.img
+              src={skill.img}
+              alt={skill.name}
+              className="w-20 h-20 object-contain z-10 relative drop-shadow-xl 
+                         group-hover:scale-110 transition-transform duration-500"
               initial={{ opacity: 0, y: -20, rotate: -10 }}
               whileInView={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ delay: index * 0.15 + 0.2, duration: 0.5 }}
               viewport={{ once: false }}
-            >
-              {skill.icon}
-            </motion.div>
+            />
 
             {/* Skill Name */}
-            <span className="text-xl md:text-2xl tracking-wide">{skill.name}</span>
+            <span className="text-xl md:text-2xl tracking-wide z-10 relative">{skill.name}</span>
           </motion.div>
         ))}
       </div>
