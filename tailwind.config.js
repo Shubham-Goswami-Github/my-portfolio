@@ -1,22 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class", // 🌙 Dark mode using "class" strategy
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}", // Scan all JS/JSX/TS/TSX files in src
+    "./public/index.html"
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ["Poppins", "sans-serif"], // Global font
-        mono: ["Fira Code", "monospace"], // For code blocks
-      },
       colors: {
-        primary: "#0f172a",   // Dark navy
-        secondary: "#38bdf8", // Sky blue
-        accent: "#facc15",    // Yellow
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(circle, var(--tw-gradient-stops))",
-        "hero-pattern": "url('/src/assets/hero-bg.svg')", // custom image background
+        primary: "#0d1b2a",     // Example primary color
+        secondary: "#e16928ff",   // Example secondary color
+        accent: "#12a0ecff",      // Accent color
       },
     },
   },
