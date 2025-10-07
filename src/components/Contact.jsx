@@ -7,11 +7,12 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="min-h-screen bg-gradient-to-b from-black to-primary px-6 py-20"
+      className="min-h-screen bg-gradient-to-b from-gray-100 via-white to-gray-200 
+                 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-6 py-20 transition-colors duration-500"
     >
       {/* Section Title */}
       <motion.h2
-        className="text-5xl md:text-6xl font-bold text-secondary text-center mb-16"
+        className="text-5xl md:text-6xl font-bold text-[#e16928ff] dark:text-yellow-400 text-center mb-16 drop-shadow-lg"
         initial={{ opacity: 0, y: -50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -22,7 +23,7 @@ const Contact = () => {
 
       {/* Contact Form Container */}
       <motion.div
-        className="max-w-3xl mx-auto bg-gradient-to-r from-gray-800 to-black p-10 rounded-3xl shadow-2xl"
+        className="max-w-3xl mx-auto bg-white/30 dark:bg-black/30 p-10 rounded-3xl shadow-2xl backdrop-blur-lg transition-colors duration-500"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -30,7 +31,7 @@ const Contact = () => {
       >
         {state.succeeded ? (
           <motion.div
-            className="text-center text-2xl text-secondary font-bold py-10"
+            className="text-center text-2xl text-[#e16928ff] dark:text-yellow-400 font-bold py-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
@@ -45,12 +46,12 @@ const Contact = () => {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <label className="text-gray-300 font-semibold">Name</label>
+              <label className="text-gray-800 dark:text-gray-200 font-semibold">Name</label>
               <input
                 type="text"
                 name="name"
                 placeholder="Your Name"
-                className="w-full p-4 rounded-xl bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-secondary transition"
+                className="w-full p-4 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 transition"
                 required
               />
             </motion.div>
@@ -61,12 +62,12 @@ const Contact = () => {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <label className="text-gray-300 font-semibold">Email</label>
+              <label className="text-gray-800 dark:text-gray-200 font-semibold">Email</label>
               <input
                 type="email"
                 name="email"
                 placeholder="Your Email"
-                className="w-full p-4 rounded-xl bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-secondary transition"
+                className="w-full p-4 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 transition"
                 required
               />
             </motion.div>
@@ -77,11 +78,11 @@ const Contact = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <label className="text-gray-300 font-semibold">Message</label>
+              <label className="text-gray-800 dark:text-gray-200 font-semibold">Message</label>
               <textarea
                 name="message"
                 placeholder="Type your message here..."
-                className="w-full p-4 rounded-2xl bg-gray-900 text-white h-40 focus:outline-none focus:ring-2 focus:ring-secondary transition resize-none"
+                className="w-full p-4 rounded-2xl bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white h-40 focus:outline-none focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 transition resize-none"
                 required
               />
             </motion.div>
@@ -95,7 +96,7 @@ const Contact = () => {
             <motion.button
               type="submit"
               disabled={state.submitting}
-              className="w-full py-4 bg-secondary text-black font-bold rounded-2xl hover:scale-105 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-red-500 transition transform duration-300"
+              className="w-full py-4 bg-[#e16928ff] dark:bg-yellow-400 text-white dark:text-black font-bold rounded-2xl hover:scale-105 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-red-500 transition transform duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
