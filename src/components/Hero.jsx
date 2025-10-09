@@ -1,7 +1,11 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react"; // scroll icon
+import { ChevronDown } from "lucide-react";
+import emailjs from "@emailjs/browser";
+import { db, serverTimestamp } from "../firebaseConfig";
+import { collection, addDoc } from "firebase/firestore";
 
+// Typing Animation Component
 const TypingEffect = ({ text, duration = 2, className }) => {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => Math.round(latest));
@@ -14,11 +18,9 @@ const TypingEffect = ({ text, duration = 2, className }) => {
       duration,
       ease: "linear",
     });
-
-    const unsubscribe = displayText.onChange((latest) => {
-      setCurrentText(latest);
-    });
-
+    const unsubscribe = displayText.onChange((latest) =>
+      setCurrentText(latest)
+    );
     return () => {
       controls.stop();
       unsubscribe();
@@ -40,82 +42,172 @@ const TypingEffect = ({ text, duration = 2, className }) => {
   );
 };
 
+// Main Hero Section
 const Hero = () => {
-  return (
-    <section
-      className="min-h-screen flex flex-col justify-center items-center text-center
-      bg-gray-200 dark:bg-gray-900 transition-colors duration-500 px-6 relative overflow-hidden"
-    >
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#e1692815] to-transparent pointer-events-none"></div>
+  const [showPopup, setShowPopup] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [particles, setParticles] = useState([]);
 
-      {/* Typing Heading */}
+  // Floating glowing particles
+  useEffect(() => {
+    const count = 30;
+    const arr = Array.from({ length: count }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 6 + 3,
+      delay: Math.random() * 5,
+    }));
+    setParticles(arr);
+  }, []);
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    try {
+      await addDoc(collection(db, "resume_requests"), {
+        Sname: formData.name,
+        email: formData.email,
+        message: formData.message || "Requesting resume download",
+        status: "Pending",
+        createdAt: serverTimestamp(),
+      });
+
+      await emailjs.send(
+        "service_r7zsx5o",
+        "template_3qknvw3",
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message || "Requesting resume download",
+          site: "my-portfolio",
+        },
+        "CXfCaFkoekA1FCLDh"
+      );
+
+      setSuccess(true);
+      setSending(false);
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setShowPopup(false), 4000);
+    } catch (err) {
+      alert("Error submitting request: " + err.message);
+      setSending(false);
+    }
+  };
+
+  return (
+    <section className="min-h-screen flex flex-col justify-center items-center text-center 
+                        bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black
+                        relative overflow-hidden px-6 transition-all duration-700">
+
+      {/* Floating Glowing Particles */}
+      {particles.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full bg-yellow-400/30 dark:bg-yellow-400/30"
+          style={{
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            top: `${p.y}%`,
+            left: `${p.x}%`,
+          }}
+          animate={{
+            y: [0, -15, 0],
+            opacity: [0.6, 1, 0.6],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 4,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Glowing Orbs */}
+      <motion.div
+        className="absolute top-10 left-10 w-64 h-64 bg-orange-200/40 dark:bg-[#e16928ff]/25 rounded-full blur-3xl"
+        animate={{
+          x: [0, 30, -20, 0],
+          y: [0, 20, -20, 0],
+          opacity: [0.5, 0.8, 0.6, 0.5],
+        }}
+        transition={{ duration: 10, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-10 right-10 w-72 h-72 bg-yellow-200/30 dark:bg-yellow-400/25 rounded-full blur-3xl"
+        animate={{
+          x: [0, -30, 20, 0],
+          y: [0, -20, 20, 0],
+          opacity: [0.4, 0.7, 0.5, 0.4],
+        }}
+        transition={{ duration: 9, repeat: Infinity }}
+      />
+
+      {/* Typing Title */}
       <TypingEffect
         text="Hi, I'm Shubham Das Goswami"
         duration={2}
-        className="text-4xl md:text-6xl font-bold 
-        text-[#e16928ff] dark:text-yellow-400 
-        font-sans tracking-wide drop-shadow-lg"
+        className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text 
+                   bg-gradient-to-r from-[#e16928ff] to-yellow-400 
+                   font-sans tracking-wide drop-shadow-lg z-10"
       />
 
       {/* Subheading */}
       <motion.p
-        className="mt-6 text-lg md:text-2xl 
-        text-gray-800 dark:text-gray-300 
-        max-w-2xl transition-colors duration-500 
-        font-medium leading-relaxed"
+        className="mt-6 text-lg md:text-2xl text-gray-800 dark:text-gray-200 
+                   max-w-2xl font-medium leading-relaxed z-10"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false }}
         transition={{ delay: 0.5, duration: 0.8 }}
       >
         A passionate Web Developer who loves building{" "}
-        <span className="font-semibold text-[#e16928ff] dark:text-yellow-400">
-          modern, responsive
-        </span>{" "}
+        <span className="font-semibold text-yellow-500">modern, responsive</span>{" "}
         and{" "}
-        <span className="font-semibold text-[#e16928ff] dark:text-yellow-400">
-          animated websites
-        </span>
-        .
+        <span className="font-semibold text-orange-500 dark:text-[#e16928ff]">animated websites</span>.
       </motion.p>
 
       {/* Buttons */}
       <motion.div
-        className="mt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6"
+        className="mt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 z-10"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false }}
         transition={{ delay: 1, duration: 0.8 }}
       >
-        <motion.a
-          href="#projects"
-          className="px-8 py-4 bg-[#e16928ff] dark:bg-yellow-400 
-          text-white dark:text-gray-900 
-          font-semibold rounded-lg shadow-lg 
-          hover:scale-105 hover:shadow-xl 
-          transition-transform duration-300"
-          whileHover={{ scale: 1.1 }}
-        >
-          View Projects
-        </motion.a>
+        {[{ label: "View Projects", href: "#projects" },
+          { label: "Contact Me", href: "#contact" }].map((btn, idx) => (
+          <motion.a
+            key={idx}
+            href={btn.href}
+            className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
+                       text-white font-semibold rounded-lg shadow-lg hover:brightness-110 hover:scale-105 
+                       transition-transform duration-300"
+            whileHover={{ scale: 1.05 }}
+          >
+            {btn.label}
+          </motion.a>
+        ))}
 
-        <motion.a
-          href="#contact"
-          className="px-8 py-4 border border-[#e16928ff] dark:border-yellow-400 
-          text-[#e16928ff] dark:text-yellow-400 
-          rounded-lg hover:bg-[#e16928ff] dark:hover:bg-yellow-400 
-          hover:text-white dark:hover:text-gray-900 
-          transition-colors duration-300 font-semibold shadow hover:shadow-lg"
-          whileHover={{ scale: 1.1 }}
+        <motion.button
+          onClick={() => setShowPopup(true)}
+          className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
+                     text-white font-semibold rounded-lg shadow-lg hover:brightness-110 hover:scale-105 
+                     transition-transform duration-300"
+          whileHover={{ scale: 1.05 }}
         >
-          Contact Me
-        </motion.a>
+          Download Resume
+        </motion.button>
       </motion.div>
 
-      {/* Animated Scroll Icon */}
+      {/* Scroll Icon */}
       <motion.div
-        className="absolute bottom-10 text-4xl text-[#e16928ff] dark:text-yellow-400 animate-bounce"
+        className="absolute bottom-10 text-4xl text-yellow-500 animate-bounce z-10"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false }}
@@ -128,6 +220,95 @@ const Hero = () => {
       >
         <ChevronDown size={40} />
       </motion.div>
+
+      {/* Resume Request Popup */}
+      {showPopup && (
+        <motion.div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative 
+                       border border-gray-200 dark:border-yellow-400/30"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <button
+              className="absolute top-4 right-4 text-gray-700 dark:text-gray-300 font-bold text-xl hover:scale-110 transition"
+              onClick={() => setShowPopup(false)}
+            >
+              ✕
+            </button>
+
+            <h3 className="text-2xl font-bold mb-4 text-[#e16928ff] dark:text-yellow-400">
+              Request Resume
+            </h3>
+
+            {success ? (
+              <motion.p
+                className="text-green-500 font-semibold text-center py-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                ✅ Request sent successfully!  
+                <br />You will receive confirmation soon.
+              </motion.p>
+            ) : (
+              <motion.form
+                className="flex flex-col space-y-4"
+                onSubmit={handleSubmit}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
+                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
+                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+                <textarea
+                  name="message"
+                  placeholder="Optional message"
+                  rows="3"
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white resize-none 
+                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition"
+                  value={formData.message}
+                  onChange={handleChange}
+                />
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="bg-gradient-to-r from-[#e16928ff] to-yellow-400 text-white dark:text-gray-900 
+                  font-semibold py-3 rounded-lg hover:brightness-110 transition duration-300"
+                >
+                  {sending ? "Sending..." : "Send Request"}
+                </button>
+              </motion.form>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
     </section>
   );
 };

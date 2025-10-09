@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { a } from "framer-motion/client";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
 // Projects data
@@ -28,7 +29,7 @@ const projects = [
     title: "Portfolio Website",
     description: "A responsive, animated portfolio website built using React, Tailwind CSS, and Framer Motion (2025).",
     image: "https://github.com/Shubham-Goswami-Github/portfolio-images/blob/main/portfolioproject.png?raw=true",
-    github: "https://github.com/Shubham-Goswami-Github/portfolio-images",
+    github: "https://github.com/Shubham-Goswami-Github/my-portfolio",
     demo: "#"
   }
 ];
@@ -128,3 +129,7 @@ const Projects = () => {
 };
 
 export default Projects;
+
+
+
+
