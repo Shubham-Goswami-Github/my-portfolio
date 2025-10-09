@@ -16,12 +16,19 @@ const projects = [
     image: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150733.png",
     github: "https://github.com/Shubham-Goswami-Github/Android-Daily-Expense-Tracker",
     demo: "#"
-  },  
+  },
   {
     title: "Unstop Clone Project",
     description: "A web application built using Django, PHP, HTML, CSS, Bootstrap, and JavaScript.",
     image: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150607.png",
     github: "https://github.com/Shubham-Goswami-Github/unstop-clone",
+    demo: "#"
+  },
+  {
+    title: "Portfolio Website",
+    description: "A responsive, animated portfolio website built using React, Tailwind CSS, and Framer Motion (2025).",
+    image: "https://github.com/Shubham-Goswami-Github/portfolio-images/blob/main/portfolioproject.png?raw=true",
+    github: "https://github.com/Shubham-Goswami-Github/portfolio-images",
     demo: "#"
   }
 ];
@@ -46,13 +53,14 @@ const Projects = () => {
       </motion.h2>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 max-w-6xl mx-auto">
         {projects.map((project, index) => (
           <motion.div
             key={project.title}
-            className="relative bg-white/30 dark:bg-black/30 rounded-2xl shadow-2xl overflow-hidden cursor-pointer 
-                       flex flex-col transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-[0_25px_35px_rgba(0,0,0,0.5)]
-                       border border-gray-200 dark:border-gray-700 backdrop-blur-lg"
+            className="relative bg-white/30 dark:bg-black/30 rounded-2xl shadow-2xl overflow-hidden cursor-pointer
+                       flex flex-col transition-all duration-500 hover:scale-105 hover:rotate-1 
+                       hover:shadow-[0_25px_35px_rgba(0,0,0,0.5)]
+                       border border-gray-200 dark:border-gray-700 backdrop-blur-lg group"
             initial={{ opacity: 0, y: 50, scale: 0.85 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             whileHover={{ scale: 1.05, rotate: 1, boxShadow: "0 25px 35px rgba(225,105,40,0.5)" }}
@@ -82,15 +90,21 @@ const Projects = () => {
               transition={{ duration: 0.6, delay: index * 0.3 }}
               viewport={{ once: false }}
             >
-              <h3 className="text-xl md:text-2xl font-bold text-[#e16928ff] dark:text-yellow-400 mb-2">{project.title}</h3>
-              <p className="text-gray-800 dark:text-gray-200 text-sm md:text-base mb-4">{project.description}</p>
+              <h3 className="text-xl md:text-2xl font-bold text-[#e16928ff] dark:text-yellow-400 mb-2">
+                {project.title}
+              </h3>
+              <p className="text-gray-800 dark:text-gray-200 text-sm md:text-base mb-4">
+                {project.description}
+              </p>
 
               <div className="flex space-x-4 mt-auto">
                 <a
                   href={project.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-black dark:text-white transition"
+                  className="flex items-center justify-center w-10 h-10 rounded-full 
+                             bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 
+                             text-black dark:text-white transition"
                 >
                   <FaGithub size={20} />
                 </a>
@@ -98,7 +112,9 @@ const Projects = () => {
                   href={project.demo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 hover:bg-blue-500 dark:hover:bg-yellow-400 text-black dark:text-black transition"
+                  className="flex items-center justify-center w-10 h-10 rounded-full 
+                             bg-gray-300 dark:bg-gray-700 hover:bg-blue-500 dark:hover:bg-yellow-400 
+                             text-black dark:text-black transition"
                 >
                   <FaExternalLinkAlt size={18} />
                 </a>
