@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { db, serverTimestamp } from "../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
+import { useRef } from "react";
 
 // Typing Animation Component
 const TypingEffect = ({ text, duration = 2, className }) => {
@@ -42,6 +43,125 @@ const TypingEffect = ({ text, duration = 2, className }) => {
 
 // Main Hero Section
 const Hero = () => {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Planets
+    const planets = [
+      { x: width * 0.2, y: height * 0.3, r: 60, color: "#e16928", dx: 0.2, dy: 0.1 },
+      { x: width * 0.7, y: height * 0.7, r: 40, color: "#fcd34d", dx: -0.15, dy: 0.18 },
+      { x: width * 0.5, y: height * 0.15, r: 30, color: "#38bdf8", dx: 0.12, dy: -0.13 },
+    ];
+
+    // Stars
+    const stars = Array.from({ length: 120 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.2 + 0.5,
+      twinkle: Math.random() * 0.5 + 0.5,
+      speed: Math.random() * 0.2 + 0.05,
+    }));
+
+    // Falling stars
+    let fallingStars = [];
+    function spawnFallingStar() {
+      fallingStars.push({
+        x: Math.random() * width,
+        y: -10,
+        r: Math.random() * 2 + 1,
+        dx: Math.random() * 2 - 1,
+        dy: Math.random() * 3 + 2,
+        alpha: 1,
+      });
+    }
+
+    let lastFallingStar = 0;
+    function animateBg(ts) {
+      ctx.clearRect(0, 0, width, height);
+
+      // Planets
+      planets.forEach((p) => {
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 40;
+        ctx.fill();
+        ctx.restore();
+        // Move
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < -p.r) p.x = width + p.r;
+        if (p.x > width + p.r) p.x = -p.r;
+        if (p.y < -p.r) p.y = height + p.r;
+        if (p.y > height + p.r) p.y = -p.r;
+      });
+
+      // Stars
+      stars.forEach((s, i) => {
+        ctx.save();
+        ctx.globalAlpha = s.twinkle + Math.sin(ts / 500 + i) * 0.3;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.restore();
+        // Move
+        s.x += s.speed;
+        if (s.x > width) s.x = 0;
+      });
+
+      // Falling stars
+      fallingStars.forEach((fs) => {
+        ctx.save();
+        ctx.globalAlpha = fs.alpha;
+        ctx.beginPath();
+        ctx.arc(fs.x, fs.y, fs.r, 0, 2 * Math.PI);
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 20;
+        ctx.fill();
+        ctx.restore();
+        // Move
+        fs.x += fs.dx;
+        fs.y += fs.dy;
+        fs.alpha -= 0.008;
+      });
+      fallingStars = fallingStars.filter((fs) => fs.y < height && fs.alpha > 0.1);
+
+      // Spawn falling star every 1.5s
+      if (ts - lastFallingStar > 1500) {
+        spawnFallingStar();
+        lastFallingStar = ts;
+      }
+
+      requestAnimationFrame(animateBg);
+    }
+    animateBg(0);
+
+    // Resize handler
+    function handleResize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -103,6 +223,18 @@ const Hero = () => {
                  bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black
                  relative overflow-hidden px-6 transition-all duration-700"
     >
+      {/* Animated Planets & Stars Canvas */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
       {/* Floating Glowing Particles */}
       {particles.map((p, i) => (
         <motion.div
@@ -209,17 +341,23 @@ const Hero = () => {
       </motion.div>
 
       {/* Scroll Icon */}
-      <motion.div
-        className="absolute bottom-10 text-4xl text-yellow-500 z-10"
-        animate={{ y: [0, 10, 0], opacity: [1, 0.7, 1] }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      >
-        <ChevronDown size={40} />
-      </motion.div>
+        <motion.div
+          className="absolute bottom-10 text-4xl text-yellow-500 z-10 cursor-pointer"
+          animate={{ y: [0, 10, 0], opacity: [1, 0.7, 1] }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          onClick={() => {
+            const aboutSection = document.getElementById("about");
+            if (aboutSection) {
+              aboutSection.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
+        >
+          <ChevronDown size={40} />
+        </motion.div>
 
       {/* Resume Request Popup */}
       {showPopup && (
@@ -314,5 +452,6 @@ const Hero = () => {
     </section>
   );
 };
+
 
 export default Hero;

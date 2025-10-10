@@ -74,30 +74,47 @@ const Testimonials = () => {
         <Particles
           id="tsparticles-testimonials"
           init={particlesInit}
-          options={{
-            background: { color: { value: "transparent" } },
-            fpsLimit: 60,
-            particles: {
-              number: { value: 70 },
-              color: { value: ["#e16928", "#fcd34d"] },
-              shape: { type: "circle" },
-              opacity: { value: 0.5 },
-              size: { value: { min: 1, max: 3 } },
-              move: { enable: true, speed: 1.2, random: true },
-              links: {
-                enable: true,
-                color: "#e16928",
-                distance: 120,
-                opacity: 0.25,
-                width: 1,
+            options={{
+              background: { color: { value: "transparent" } },
+              fpsLimit: 120,
+              particles: {
+                number: { value: 90, density: { enable: true, area: 800 } },
+                color: { value: ["#e16928", "#fcd34d"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.45, anim: { enable: true, speed: 0.5, sync: false } },
+                size: { value: { min: 2, max: 4 }, anim: { enable: true, speed: 2, sync: false } },
+                move: {
+                  enable: true,
+                  speed: 1.1,
+                  direction: "none",
+                  random: true,
+                  straight: false,
+                  outModes: { default: "out" },
+                  attract: { enable: false },
+                },
+                links: {
+                  enable: true,
+                  color: "#e16928",
+                  distance: 130,
+                  opacity: 0.22,
+                  width: 1.2,
+                  shadow: { enable: true, color: "#e16928", blur: 2 },
+                },
               },
-            },
-            interactivity: {
-              events: { onHover: { enable: true, mode: "repulse" }, resize: true },
-              modes: { repulse: { distance: 100, duration: 0.4 } },
-            },
-            detectRetina: true,
-          }}
+              interactivity: {
+                events: {
+                  onHover: { enable: true, mode: "grab" },
+                  onClick: { enable: true, mode: "push" },
+                  resize: true,
+                },
+                modes: {
+                  grab: { distance: 160, line_linked: { opacity: 0.35 } },
+                  push: { quantity: 4 },
+                  repulse: { distance: 120, duration: 0.5 },
+                },
+              },
+              detectRetina: true,
+            }}
         />
       </div>
 
@@ -152,9 +169,9 @@ const Testimonials = () => {
       {/* Auto-scrolling Testimonials Carousel */}
       <div className="relative w-full overflow-hidden max-w-7xl mx-auto z-10">
         <motion.div
-          className="flex gap-10"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+            className="flex gap-10"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ repeat: Infinity, duration: 32, ease: "easeInOut" }}
         >
           {[...testimonials, ...testimonials].map((t, i) => (
             <motion.div
@@ -164,18 +181,18 @@ const Testimonials = () => {
                          shadow-lg p-8 flex flex-col items-center text-center space-y-4 
                          hover:shadow-[0_0_35px_rgba(225,105,40,0.6)]
                          transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.8, delay: i * 0.1 }}
+                initial={{ opacity: 0, scale: 0.92 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.04 }}
+                transition={{ duration: 1.1, delay: i * 0.08, ease: "easeInOut" }}
             >
               <motion.img
                 src={t.img}
                 alt={t.name}
                 className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-[#e16928]"
-                initial={{ opacity: 0, y: -20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                  initial={{ opacity: 0, y: -18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, ease: "easeInOut" }}
               />
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic">
                 “{t.feedback}”
