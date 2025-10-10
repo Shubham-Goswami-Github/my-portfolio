@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { FaGithub, FaExternalLinkAlt, FaFileDownload } from "react-icons/fa";
 
 // 🧩 Project Data
@@ -68,76 +68,18 @@ const projects = [
 ];
 
 const Projects = () => {
-  const [particles, setParticles] = useState([]);
-
-  // ✨ Floating background particles (same as About & Skills)
-  useEffect(() => {
-    const count = 30;
-    const arr = Array.from({ length: count }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 6 + 3,
-      delay: Math.random() * 5,
-    }));
-    setParticles(arr);
-  }, []);
+  // ...existing code...
 
   return (
     <section
       id="projects"
-      className="relative min-h-screen bg-white dark:bg-gray-900 transition-colors duration-700 overflow-hidden px-6 py-20 flex flex-col items-center"
+      className="relative flex flex-col items-center px-6 py-20 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black transition-colors duration-700 overflow-hidden"
+      style={{ minHeight: "100vh", height: "auto", position: "relative" }}
     >
-      {/* Floating Particles */}
-      {particles.map((p, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-yellow-400/20 dark:bg-yellow-500/20"
-          style={{
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            top: `${p.y}%`,
-            left: `${p.x}%`,
-          }}
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.5, 0.9, 0.5],
-          }}
-          transition={{
-            duration: 10 + Math.random() * 6,
-            repeat: Infinity,
-            delay: p.delay,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-
-      {/* Glowing Orbs */}
-      <motion.div
-        className="absolute top-10 left-10 w-72 h-72 bg-[#e16928ff]/20 rounded-full blur-3xl"
-        animate={{
-          x: [0, 25, -20, 0],
-          y: [0, 15, -20, 0],
-          opacity: [0.4, 0.6, 0.4],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-10 right-10 w-80 h-80 bg-yellow-400/20 rounded-full blur-3xl"
-        animate={{
-          x: [0, -25, 15, 0],
-          y: [0, -15, 20, 0],
-          opacity: [0.4, 0.6, 0.4],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      {/* Animated Planets & Stars Background - covers full section */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, width: "100%", minHeight: "100vh", height: "100%", zIndex: 0, pointerEvents: "none" }}>
+        <AnimatedPlanetStarBackground />
+      </div>
 
       {/* Section Title */}
       <motion.h2

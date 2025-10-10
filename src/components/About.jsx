@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useRef } from "react";
+import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { TypeAnimation } from "react-type-animation";
 import { useEffect, useState } from "react";
 import { FaGraduationCap, FaUniversity, FaStar, FaLaptopCode } from "react-icons/fa";
@@ -77,193 +77,18 @@ const aboutTextVariant = {
 };
 
 const About = () => {
-  // Designer animated shapes & stars canvas
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-
-    // Geometric shapes (triangles, squares, hexagons)
-    const shapes = Array.from({ length: 10 }, (_, i) => {
-      const types = ["triangle", "square", "hexagon"];
-      const type = types[i % types.length];
-      return {
-        type,
-        x: Math.random() * width,
-        y: Math.random() * height,
-        size: Math.random() * 60 + 40,
-        color:
-          type === "triangle"
-            ? "#e16928"
-            : type === "square"
-            ? "#fcd34d"
-            : "#38bdf8",
-        dx: Math.random() * 0.5 - 0.25,
-        dy: Math.random() * 0.5 - 0.25,
-        angle: Math.random() * Math.PI * 2,
-        dAngle: Math.random() * 0.01 - 0.005,
-      };
-    });
-
-    // Stars
-    const stars = Array.from({ length: 120 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      r: Math.random() * 1.2 + 0.5,
-      twinkle: Math.random() * 0.5 + 0.5,
-      speed: Math.random() * 0.2 + 0.05,
-    }));
-
-    // Falling stars
-    let fallingStars = [];
-    function spawnFallingStar() {
-      fallingStars.push({
-        x: Math.random() * width,
-        y: -10,
-        r: Math.random() * 2 + 1,
-        dx: Math.random() * 2 - 1,
-        dy: Math.random() * 3 + 2,
-        alpha: 1,
-      });
-    }
-
-    let lastFallingStar = 0;
-    function drawShape(s) {
-      ctx.save();
-      ctx.globalAlpha = 0.7;
-      ctx.translate(s.x, s.y);
-      ctx.rotate(s.angle);
-      ctx.beginPath();
-      if (s.type === "triangle") {
-        for (let i = 0; i < 3; i++) {
-          const theta = (i * 2 * Math.PI) / 3;
-          const x = Math.cos(theta) * s.size;
-          const y = Math.sin(theta) * s.size;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-      } else if (s.type === "square") {
-        for (let i = 0; i < 4; i++) {
-          const theta = (i * 2 * Math.PI) / 4 + Math.PI / 4;
-          const x = Math.cos(theta) * s.size;
-          const y = Math.sin(theta) * s.size;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-      } else if (s.type === "hexagon") {
-        for (let i = 0; i < 6; i++) {
-          const theta = (i * 2 * Math.PI) / 6;
-          const x = Math.cos(theta) * s.size;
-          const y = Math.sin(theta) * s.size;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-      }
-      ctx.fillStyle = s.color;
-      ctx.shadowColor = s.color;
-      ctx.shadowBlur = 40;
-      ctx.fill();
-      ctx.restore();
-    }
-
-    function animateBg(ts) {
-      ctx.clearRect(0, 0, width, height);
-
-      // Shapes
-      shapes.forEach((s) => {
-        drawShape(s);
-        s.x += s.dx;
-        s.y += s.dy;
-        s.angle += s.dAngle;
-        if (s.x < -s.size) s.x = width + s.size;
-        if (s.x > width + s.size) s.x = -s.size;
-        if (s.y < -s.size) s.y = height + s.size;
-        if (s.y > height + s.size) s.y = -s.size;
-      });
-
-      // Stars
-      stars.forEach((st, i) => {
-        ctx.save();
-        ctx.globalAlpha = st.twinkle + Math.sin(ts / 500 + i) * 0.3;
-        ctx.beginPath();
-        ctx.arc(st.x, st.y, st.r, 0, 2 * Math.PI);
-        ctx.fillStyle = "#fff";
-        ctx.shadowColor = "#fff";
-        ctx.shadowBlur = 10;
-        ctx.fill();
-        ctx.restore();
-        // Move
-        st.x += st.speed;
-        if (st.x > width) st.x = 0;
-      });
-
-      // Falling stars
-      fallingStars.forEach((fs) => {
-        ctx.save();
-        ctx.globalAlpha = fs.alpha;
-        ctx.beginPath();
-        ctx.arc(fs.x, fs.y, fs.r, 0, 2 * Math.PI);
-        ctx.fillStyle = "#fff";
-        ctx.shadowColor = "#fff";
-        ctx.shadowBlur = 20;
-        ctx.fill();
-        ctx.restore();
-        // Move
-        fs.x += fs.dx;
-        fs.y += fs.dy;
-        fs.alpha -= 0.008;
-      });
-      fallingStars = fallingStars.filter((fs) => fs.y < height && fs.alpha > 0.1);
-
-      // Spawn falling star every 1.5s
-      if (ts - lastFallingStar > 1500) {
-        spawnFallingStar();
-        lastFallingStar = ts;
-      }
-
-      requestAnimationFrame(animateBg);
-    }
-    animateBg(0);
-
-    // Resize handler
-    function handleResize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    }
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   return (
     <section
       id="about"
       className="min-h-screen relative flex flex-col justify-center items-center px-6 py-20
-                 bg-white dark:bg-gray-900 transition-colors duration-700 overflow-hidden"
+                 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black transition-all duration-700 overflow-hidden"
+      style={{ position: "relative" }}
     >
-      {/* Seamless animated planets & stars canvas */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
+      {/* Reusable Animated Planets & Stars Background - covers full section */}
+      <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0 }}>
+        <AnimatedPlanetStarBackground />
+      </div>
 
       {/* Glowing orbs (theme preserved) */}
       <motion.div
@@ -356,8 +181,8 @@ const About = () => {
         {education.map((edu, idx) => (
           <motion.article
             key={edu.degree}
-            className="relative flex items-stretch gap-0 bg-white/20 dark:bg-gray-800/40 border border-white/10 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden
-                       transition-transform duration-300 hover:scale-[1.02] hover:shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
+            className="relative flex items-stretch gap-0 bg-white/10 dark:bg-black/10 border border-yellow-400/30 dark:border-yellow-400/40 rounded-2xl shadow-2xl overflow-hidden
+                       transition-transform duration-500 hover:scale-[1.04] hover:shadow-[0_0_40px_0_rgba(225,105,40,0.18)] hover:border-yellow-400"
             custom={idx}
             initial="hidden"
             whileInView="visible"
@@ -365,7 +190,11 @@ const About = () => {
             viewport={{ once: true, amount: 0.2 }}
             role="article"
             aria-label={edu.degree}
+            whileHover={{ scale: 1.06, boxShadow: "0 0 60px 0 #e16928", borderColor: "#e16928" }}
           >
+            {/* Animated Glow on hover */}
+            <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700 bg-gradient-to-r from-[#e16928ff] to-yellow-400 blur-2xl"></div>
+
             {/* Left image area (fixed width rectangle) */}
             <motion.div
               className="flex-shrink-0 w-36 md:w-44 h-36 md:h-auto"
@@ -373,11 +202,13 @@ const About = () => {
               whileInView="visible"
               variants={imageVariant}
               viewport={{ once: true, amount: 0.3 }}
+              whileHover={{ scale: 1.08, rotate: 2 }}
+              transition={{ type: "spring", stiffness: 120, damping: 14 }}
             >
               <img
                 src={edu.img}
                 alt={`${edu.degree} photo`}
-                className="w-full h-full object-cover object-center block"
+                className="w-full h-full object-cover object-center block rounded-xl shadow-lg"
               />
             </motion.div>
 
@@ -388,6 +219,8 @@ const About = () => {
               whileInView="visible"
               variants={detailsVariant}
               viewport={{ once: true, amount: 0.3 }}
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 110, damping: 13 }}
             >
               <div>
                 <h3 className="flex items-center gap-2 text-lg md:text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400">
@@ -406,18 +239,32 @@ const About = () => {
 
                 <ul className="mt-3 list-disc pl-5 text-sm md:text-sm text-gray-700 dark:text-gray-300 space-y-1">
                   {edu.highlights.map((pt, j) => (
-                    <li key={j} className="leading-tight">
+                    <motion.li
+                      key={j}
+                      className="leading-tight"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: j * 0.12 + 0.2 }}
+                      viewport={{ once: true }}
+                    >
                       {pt}
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
               </div>
 
               {/* subtle CTA / meta area (optional) */}
-              <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 flex items-center justify-end gap-2">
+              <motion.div
+                className="mt-4 text-xs text-gray-600 dark:text-gray-400 flex items-center justify-end gap-2"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ color: "#e16928" }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+              >
                 <span className="hidden md:inline">More →</span>
                 <FaLaptopCode className="opacity-20 text-2xl" />
-              </div>
+              </motion.div>
             </motion.div>
           </motion.article>
         ))}

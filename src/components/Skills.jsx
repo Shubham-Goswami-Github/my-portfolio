@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { useEffect, useState } from "react";
 
 const skills = [
@@ -13,49 +14,17 @@ const skills = [
 ];
 
 const Skills = () => {
-  const [particles, setParticles] = useState([]);
-
-  // Floating background particles (like in About)
-  useEffect(() => {
-    const count = 35;
-    const arr = Array.from({ length: count }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 6 + 3,
-      delay: Math.random() * 5,
-    }));
-    setParticles(arr);
-  }, []);
+  // Remove local particles, use global animated background
 
   return (
     <section
       id="skills"
       className="relative min-h-screen flex flex-col justify-center items-center px-6 py-20 
-                 bg-white dark:bg-gray-900 transition-colors duration-700 overflow-hidden"
+                 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black transition-all duration-700 overflow-hidden"
     >
-      {/* ✨ Floating background particles */}
-      {particles.map((p, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-yellow-400/30 dark:bg-yellow-500/30"
-          style={{
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            top: `${p.y}%`,
-            left: `${p.x}%`,
-          }}
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 8 + Math.random() * 4,
-            repeat: Infinity,
-            delay: p.delay,
-            ease: [0.45, 0, 0.55, 1],
-          }}
-        />
-      ))}
+      {/* Reusable Animated Planets & Stars Background */}
+      <AnimatedPlanetStarBackground />
+      {/* Removed local particles for seamless background */}
 
       {/* Glowing orbs like About section */}
       <motion.div
@@ -111,17 +80,20 @@ const Skills = () => {
                        bg-white/20 dark:bg-black/20 backdrop-blur-xl
                        shadow-xl border border-gray-200 dark:border-gray-700
                        hover:border-yellow-400 transition-all duration-700"
-            initial={{ opacity: 0, y: 60, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, y: 80, scale: 0.85, rotate: -6 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
             whileHover={{
-              scale: 1.1,
-              rotate: 1,
-              boxShadow: "0 0 35px 8px rgba(255,215,0,0.4)",
+              scale: 1.13,
+              rotate: 4,
+              boxShadow: "0 0 45px 12px rgba(255,215,0,0.5)",
+              filter: "brightness(1.08) blur(0.5px)",
             }}
             transition={{
-              duration: 0.8,
-              delay: index * 0.1,
-              ease: [0.45, 0, 0.55, 1],
+              duration: 0.9,
+              delay: index * 0.12,
+              type: "spring",
+              stiffness: 120,
+              damping: 14,
             }}
             viewport={{ once: false }}
           >
@@ -135,21 +107,31 @@ const Skills = () => {
               src={skill.img}
               alt={skill.name}
               className="w-20 h-20 object-contain z-10 relative drop-shadow-xl 
-                         group-hover:scale-110 transition-transform duration-500"
-              initial={{ opacity: 0, y: -20, rotate: -10 }}
+                         group-hover:scale-125 group-hover:rotate-6 transition-transform duration-500"
+              initial={{ opacity: 0, y: -30, rotate: -12 }}
               whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+              whileHover={{ scale: 1.25, rotate: 6 }}
               transition={{
                 delay: index * 0.15 + 0.2,
-                duration: 0.6,
-                ease: [0.42, 0, 0.58, 1],
+                duration: 0.7,
+                type: "spring",
+                stiffness: 110,
+                damping: 12,
               }}
               viewport={{ once: false }}
             />
 
             {/* Skill Name */}
-            <span className="text-xl md:text-2xl tracking-wide z-10 relative">
+            <motion.span
+              className="text-xl md:text-2xl tracking-wide z-10 relative"
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ color: "#e16928", textShadow: "0 0 18px #fcd34d" }}
+              transition={{ duration: 0.5, delay: index * 0.13 + 0.3 }}
+              viewport={{ once: false }}
+            >
               {skill.name}
-            </span>
+            </motion.span>
           </motion.div>
         ))}
       </div>

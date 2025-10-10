@@ -5,6 +5,7 @@ import emailjs from "@emailjs/browser";
 import { db, serverTimestamp } from "../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import { useRef } from "react";
+import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 
 // Typing Animation Component
 const TypingEffect = ({ text, duration = 2, className }) => {
@@ -12,12 +13,24 @@ const TypingEffect = ({ text, duration = 2, className }) => {
   const rounded = useTransform(count, (latest) => Math.round(latest));
   const displayText = useTransform(rounded, (latest) => text.slice(0, latest));
   const [currentText, setCurrentText] = useState("");
+  const [planetAnim, setPlanetAnim] = useState(false);
+
+  // Listen for planet passing event from canvas
+  useEffect(() => {
+    window.__planetTextAnim = () => {
+      setPlanetAnim(true);
+      setTimeout(() => setPlanetAnim(false), 600);
+    };
+    return () => {
+      window.__planetTextAnim = undefined;
+    };
+  }, []);
 
   useEffect(() => {
     const controls = animate(count, text.length, {
       type: "tween",
       duration,
-      ease: "easeInOut", // smoother easing
+      ease: "easeInOut",
     });
     const unsubscribe = displayText.onChange((latest) => setCurrentText(latest));
     return () => {
@@ -28,140 +41,37 @@ const TypingEffect = ({ text, duration = 2, className }) => {
 
   return (
     <motion.h2
-      className={className}
+      className={className + " font-extrabold font-[Montserrat,Inter,sans-serif] relative"}
       aria-label={text}
       aria-live="polite"
       initial={{ opacity: 0, y: -30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false }}
-      transition={{ duration: 1.2, ease: "easeOut" }}
+      animate={planetAnim ? { scale: 1.08, textShadow: "0 0 32px #fcd34d" } : { scale: 1, textShadow: "0 0 0px #fcd34d" }}
+      transition={{ duration: planetAnim ? 0.6 : 1.2, ease: "easeOut" }}
+      style={{
+        background: "linear-gradient(90deg,#e16928,#fcd34d,#38bdf8)",
+        backgroundSize: "200% 200%",
+        backgroundClip: "text",
+        WebkitBackgroundClip: "text",
+        color: "transparent",
+        animation: "gradientMove 3s ease-in-out infinite",
+      }}
     >
       {currentText}
+      <style>{`
+        @keyframes gradientMove {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </motion.h2>
   );
 };
 
 // Main Hero Section
 const Hero = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-
-    // Planets
-    const planets = [
-      { x: width * 0.2, y: height * 0.3, r: 60, color: "#e16928", dx: 0.2, dy: 0.1 },
-      { x: width * 0.7, y: height * 0.7, r: 40, color: "#fcd34d", dx: -0.15, dy: 0.18 },
-      { x: width * 0.5, y: height * 0.15, r: 30, color: "#38bdf8", dx: 0.12, dy: -0.13 },
-    ];
-
-    // Stars
-    const stars = Array.from({ length: 120 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      r: Math.random() * 1.2 + 0.5,
-      twinkle: Math.random() * 0.5 + 0.5,
-      speed: Math.random() * 0.2 + 0.05,
-    }));
-
-    // Falling stars
-    let fallingStars = [];
-    function spawnFallingStar() {
-      fallingStars.push({
-        x: Math.random() * width,
-        y: -10,
-        r: Math.random() * 2 + 1,
-        dx: Math.random() * 2 - 1,
-        dy: Math.random() * 3 + 2,
-        alpha: 1,
-      });
-    }
-
-    let lastFallingStar = 0;
-    function animateBg(ts) {
-      ctx.clearRect(0, 0, width, height);
-
-      // Planets
-      planets.forEach((p) => {
-        ctx.save();
-        ctx.globalAlpha = 0.7;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-        ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 40;
-        ctx.fill();
-        ctx.restore();
-        // Move
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < -p.r) p.x = width + p.r;
-        if (p.x > width + p.r) p.x = -p.r;
-        if (p.y < -p.r) p.y = height + p.r;
-        if (p.y > height + p.r) p.y = -p.r;
-      });
-
-      // Stars
-      stars.forEach((s, i) => {
-        ctx.save();
-        ctx.globalAlpha = s.twinkle + Math.sin(ts / 500 + i) * 0.3;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
-        ctx.fillStyle = "#fff";
-        ctx.shadowColor = "#fff";
-        ctx.shadowBlur = 10;
-        ctx.fill();
-        ctx.restore();
-        // Move
-        s.x += s.speed;
-        if (s.x > width) s.x = 0;
-      });
-
-      // Falling stars
-      fallingStars.forEach((fs) => {
-        ctx.save();
-        ctx.globalAlpha = fs.alpha;
-        ctx.beginPath();
-        ctx.arc(fs.x, fs.y, fs.r, 0, 2 * Math.PI);
-        ctx.fillStyle = "#fff";
-        ctx.shadowColor = "#fff";
-        ctx.shadowBlur = 20;
-        ctx.fill();
-        ctx.restore();
-        // Move
-        fs.x += fs.dx;
-        fs.y += fs.dy;
-        fs.alpha -= 0.008;
-      });
-      fallingStars = fallingStars.filter((fs) => fs.y < height && fs.alpha > 0.1);
-
-      // Spawn falling star every 1.5s
-      if (ts - lastFallingStar > 1500) {
-        spawnFallingStar();
-        lastFallingStar = ts;
-      }
-
-      requestAnimationFrame(animateBg);
-    }
-    animateBg(0);
-
-    // Resize handler
-    function handleResize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    }
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
   const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -223,61 +133,8 @@ const Hero = () => {
                  bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black
                  relative overflow-hidden px-6 transition-all duration-700"
     >
-      {/* Animated Planets & Stars Canvas */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
-      {/* Floating Glowing Particles */}
-      {particles.map((p, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-yellow-400/30 dark:bg-yellow-400/30"
-          style={{
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            top: `${p.y}%`,
-            left: `${p.x}%`,
-          }}
-          animate={{
-            y: [0, -15, 0],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 6 + Math.random() * 3, // slower & smoother
-            repeat: Infinity,
-            delay: p.delay,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-
-      {/* Glowing Orbs */}
-      <motion.div
-        className="absolute top-10 left-10 w-64 h-64 bg-orange-200/40 dark:bg-[#e16928ff]/25 rounded-full blur-3xl"
-        animate={{
-          x: [0, 25, -25, 0],
-          y: [0, 20, -20, 0],
-          opacity: [0.5, 0.8, 0.6, 0.5],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-10 right-10 w-72 h-72 bg-yellow-200/30 dark:bg-yellow-400/25 rounded-full blur-3xl"
-        animate={{
-          x: [0, -25, 25, 0],
-          y: [0, -20, 20, 0],
-          opacity: [0.4, 0.7, 0.5, 0.4],
-        }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Reusable Animated Planets & Stars Background */}
+      <AnimatedPlanetStarBackground />
 
       {/* Typing Title */}
       <TypingEffect
@@ -452,6 +309,9 @@ const Hero = () => {
     </section>
   );
 };
+
+
+
 
 
 export default Hero;
