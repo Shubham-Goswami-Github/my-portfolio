@@ -1,123 +1,255 @@
 import { motion } from "framer-motion";
-import { a } from "framer-motion/client";
-import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaGithub, FaExternalLinkAlt, FaFileDownload } from "react-icons/fa";
 
-// Projects data
+// 🧩 Project Data
 const projects = [
   {
     title: "Evoting System",
-    description: "A secure Evoting System built using PHP, HTML, CSS, and JavaScript (2024).",
-    image: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20145931.png",
+    description:
+      "A secure digital voting platform developed with PHP, HTML, CSS, and JavaScript. Designed to ensure fairness, transparency, and a smooth user experience.",
+    learnings:
+      "Implemented session-based authentication, improved data security with SQL injection prevention, and learned structured backend management.",
+    technologies: ["PHP", "MySQL", "HTML", "CSS", "JavaScript"],
+    duration: "March 2024 – May 2024",
+    image:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20145931.png",
     github: "https://github.com/Shubham-Goswami-Github/evoting-php",
-    demo: "#"
+    demo: "#",
+    readme:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/evoting-php/main/README.md",
   },
   {
-    title: "Daily Expense Tracker",
-    description: "Android Studio project built using Java and XML to track daily expenses (2025).",
-    image: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150733.png",
-    github: "https://github.com/Shubham-Goswami-Github/Android-Daily-Expense-Tracker",
-    demo: "#"
+    title: "Daily Expense Tracker (Android)",
+    description:
+      "An Android application that helps users track and analyze their daily spending. Built with Java and XML using Android Studio.",
+    learnings:
+      "Learned database integration with SQLite, efficient UI design with RecyclerView, and improved knowledge of Android activity lifecycle.",
+    technologies: ["Java", "XML", "Android Studio", "SQLite"],
+    duration: "Feb 2025 – April 2025",
+    image:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150733.png",
+    github:
+      "https://github.com/Shubham-Goswami-Github/Android-Daily-Expense-Tracker",
+    demo: "#",
+    readme:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/Android-Daily-Expense-Tracker/main/README.md",
   },
   {
     title: "Unstop Clone Project",
-    description: "A web application built using Django, PHP, HTML, CSS, Bootstrap, and JavaScript.",
-    image: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150607.png",
+    description:
+      "A full-stack web application replicating features of Unstop, created using Django, PHP, HTML, CSS, Bootstrap, and JavaScript.",
+    learnings:
+      "Enhanced backend knowledge with Django, improved multi-page data flow, and mastered responsive layouts using Bootstrap.",
+    technologies: ["Django", "PHP", "Bootstrap", "JavaScript"],
+    duration: "Jan 2025 – March 2025",
+    image:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150607.png",
     github: "https://github.com/Shubham-Goswami-Github/unstop-clone",
-    demo: "#"
+    demo: "#",
+    readme:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/unstop-clone/main/README.md",
   },
   {
     title: "Portfolio Website",
-    description: "A responsive, animated portfolio website built using React, Tailwind CSS, and Framer Motion (2025).",
-    image: "https://github.com/Shubham-Goswami-Github/portfolio-images/blob/main/portfolioproject.png?raw=true",
+    description:
+      "A responsive and animated personal portfolio designed with React, Tailwind CSS, and Framer Motion to showcase projects and skills.",
+    learnings:
+      "Learned advanced component-based design, optimized animations for performance, and implemented dark/light theme switching.",
+    technologies: ["React", "Tailwind CSS", "Framer Motion"],
+    duration: "Sept 2024 – Oct 2024",
+    image:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/portfolioproject.png",
     github: "https://github.com/Shubham-Goswami-Github/my-portfolio",
-    demo: "#"
-  }
+    demo: "#",
+    readme:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/my-portfolio/main/README.md",
+  },
 ];
 
 const Projects = () => {
+  const [particles, setParticles] = useState([]);
+
+  // ✨ Floating background particles (same as About & Skills)
+  useEffect(() => {
+    const count = 30;
+    const arr = Array.from({ length: count }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 6 + 3,
+      delay: Math.random() * 5,
+    }));
+    setParticles(arr);
+  }, []);
+
   return (
     <section
       id="projects"
-      className="min-h-screen bg-gradient-to-b from-gray-100 via-white to-gray-200 
-                 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-6 py-20 transition-colors duration-500"
+      className="relative min-h-screen bg-white dark:bg-gray-900 transition-colors duration-700 overflow-hidden px-6 py-20 flex flex-col items-center"
     >
+      {/* Floating Particles */}
+      {particles.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full bg-yellow-400/20 dark:bg-yellow-500/20"
+          style={{
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            top: `${p.y}%`,
+            left: `${p.x}%`,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.5, 0.9, 0.5],
+          }}
+          transition={{
+            duration: 10 + Math.random() * 6,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Glowing Orbs */}
+      <motion.div
+        className="absolute top-10 left-10 w-72 h-72 bg-[#e16928ff]/20 rounded-full blur-3xl"
+        animate={{
+          x: [0, 25, -20, 0],
+          y: [0, 15, -20, 0],
+          opacity: [0.4, 0.6, 0.4],
+        }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute bottom-10 right-10 w-80 h-80 bg-yellow-400/20 rounded-full blur-3xl"
+        animate={{
+          x: [0, -25, 15, 0],
+          y: [0, -15, 20, 0],
+          opacity: [0.4, 0.6, 0.4],
+        }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
       {/* Section Title */}
       <motion.h2
-        className="text-5xl md:text-6xl font-bold text-[#e16928ff] dark:text-yellow-400 
-                   text-center mb-16 drop-shadow-lg tracking-wide"
-        initial={{ opacity: 0, y: -50 }}
+        className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text 
+                   bg-gradient-to-r from-[#e16928ff] to-yellow-400 mb-16 tracking-wide z-10"
+        initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 1.4, ease: "easeInOut" }}
         viewport={{ once: false }}
       >
         🚀 My Projects
       </motion.h2>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 max-w-6xl mx-auto">
+      {/* Projects List */}
+      <div className="flex flex-col space-y-16 w-full max-w-6xl z-10">
         {projects.map((project, index) => (
           <motion.div
             key={project.title}
-            className="relative bg-white/30 dark:bg-black/30 rounded-2xl shadow-2xl overflow-hidden cursor-pointer
-                       flex flex-col transition-all duration-500 hover:scale-105 hover:rotate-1 
-                       hover:shadow-[0_25px_35px_rgba(0,0,0,0.5)]
-                       border border-gray-200 dark:border-gray-700 backdrop-blur-lg group"
-            initial={{ opacity: 0, y: 50, scale: 0.85 }}
+            className="relative flex flex-col md:flex-row items-center gap-10 
+                       bg-white/15 dark:bg-black/15 backdrop-blur-xl rounded-3xl shadow-xl 
+                       border border-gray-200 dark:border-gray-700 p-8 overflow-hidden
+                       hover:border-yellow-300 transition-all duration-700 group"
+            initial={{ opacity: 0, y: 60, scale: 0.96 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            whileHover={{ scale: 1.05, rotate: 1, boxShadow: "0 25px 35px rgba(225,105,40,0.5)" }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
+            transition={{ duration: 1, delay: index * 0.15, ease: "easeInOut" }}
             viewport={{ once: false }}
+            whileHover={{
+              scale: 1.015,
+              boxShadow: "0 0 25px 6px rgba(225, 105, 40, 0.25)",
+            }}
           >
-            {/* Glow effect on hover */}
-            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-50 
-                            bg-gradient-to-r from-[#e16928ff] to-yellow-400 blur-3xl transition-all duration-700"></div>
+            {/* Subtle Glow Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-70 bg-gradient-to-r from-[#e16928ff]/25 to-yellow-400/25 blur-2xl transition-all duration-700"></div>
 
-            {/* Cover Image */}
+            {/* Left: Project Image */}
             <motion.img
               src={project.image}
               alt={project.title}
-              className="w-full h-60 object-cover z-10 relative"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.25 }}
+              className="w-full md:w-1/2 h-64 object-cover rounded-2xl z-10 relative shadow-md hover:scale-105 transition-transform duration-1000 ease-in-out"
+              initial={{ opacity: 0, x: -60 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
               viewport={{ once: false }}
             />
 
-            {/* Project Details */}
+            {/* Right: Project Details */}
             <motion.div
-              className="p-6 flex flex-col justify-between flex-1 z-10 relative"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.3 }}
+              className="flex-1 z-10 relative space-y-4"
+              initial={{ opacity: 0, x: 60 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
               viewport={{ once: false }}
             >
-              <h3 className="text-xl md:text-2xl font-bold text-[#e16928ff] dark:text-yellow-400 mb-2">
+              <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400">
                 {project.title}
               </h3>
-              <p className="text-gray-800 dark:text-gray-200 text-sm md:text-base mb-4">
+
+              <p className="text-gray-800 dark:text-gray-200 text-lg leading-relaxed">
                 {project.description}
               </p>
 
-              <div className="flex space-x-4 mt-auto">
+              <p className="text-gray-700 dark:text-gray-300">
+                <strong className="text-[#e16928ff] dark:text-yellow-400">
+                  Duration:
+                </strong>{" "}
+                {project.duration}
+              </p>
+
+              <p className="text-gray-700 dark:text-gray-300">
+                <strong className="text-[#e16928ff] dark:text-yellow-400">
+                  Learnings:
+                </strong>{" "}
+                {project.learnings}
+              </p>
+
+              <p className="text-gray-700 dark:text-gray-300">
+                <strong className="text-[#e16928ff] dark:text-yellow-400">
+                  Technologies Used:
+                </strong>{" "}
+                {project.technologies.join(", ")}
+              </p>
+
+              {/* Buttons */}
+              <div className="flex flex-wrap gap-4 mt-6">
                 <a
                   href={project.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full 
-                             bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 
-                             text-black dark:text-white transition"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold
+                             bg-gray-200 dark:bg-gray-700 hover:bg-[#e16928ff]/80 dark:hover:bg-yellow-400/80
+                             text-gray-900 dark:text-white hover:text-white transition-all duration-500 shadow-md"
                 >
-                  <FaGithub size={20} />
+                  <FaGithub size={18} /> GitHub
                 </a>
                 <a
                   href={project.demo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full 
-                             bg-gray-300 dark:bg-gray-700 hover:bg-blue-500 dark:hover:bg-yellow-400 
-                             text-black dark:text-black transition"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold
+                             bg-gray-200 dark:bg-gray-700 hover:bg-blue-500/80 dark:hover:bg-yellow-400/80
+                             text-gray-900 dark:text-white hover:text-white transition-all duration-500 shadow-md"
                 >
-                  <FaExternalLinkAlt size={18} />
+                  <FaExternalLinkAlt size={16} /> Live Demo
+                </a>
+                <a
+                  href={project.readme}
+                  download
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold
+                             bg-gray-200 dark:bg-gray-700 hover:bg-green-500/80 dark:hover:bg-yellow-400/80
+                             text-gray-900 dark:text-white hover:text-white transition-all duration-500 shadow-md"
+                >
+                  <FaFileDownload size={16} /> README
                 </a>
               </div>
             </motion.div>
@@ -129,7 +261,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
-
-
-

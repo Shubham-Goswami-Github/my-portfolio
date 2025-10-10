@@ -31,8 +31,7 @@ const education = [
 
 const About = () => {
   const [particles, setParticles] = useState([]);
-  
-  // Hero floating particles
+
   useEffect(() => {
     const count = 35;
     const arr = Array.from({ length: count }, () => ({
@@ -44,7 +43,6 @@ const About = () => {
     setParticles(arr);
   }, []);
 
-  // Mini particles for cards
   const generateMiniParticles = (count = 10) => {
     return Array.from({ length: count }, () => ({
       x: Math.random() * 100,
@@ -60,7 +58,7 @@ const About = () => {
       className="min-h-screen relative flex flex-col justify-center items-center px-6 py-20
                  bg-white dark:bg-gray-900 transition-colors duration-700 overflow-hidden"
     >
-      {/* ✨ Hero Floating Particles */}
+      {/* ✨ Background Floating Particles */}
       {particles.map((p, i) => (
         <motion.div
           key={i}
@@ -71,12 +69,9 @@ const About = () => {
             top: `${p.y}%`,
             left: `${p.x}%`,
           }}
-          animate={{
-            y: [0, -15, 0],
-            opacity: [0.6, 1, 0.6],
-          }}
+          animate={{ y: [0, -20, 0], opacity: [0.6, 1, 0.6] }}
           transition={{
-            duration: 5 + Math.random() * 4,
+            duration: 8 + Math.random() * 4,
             repeat: Infinity,
             delay: p.delay,
             ease: "easeInOut",
@@ -84,51 +79,41 @@ const About = () => {
         />
       ))}
 
-      {/* Glowing Orbs */}
+      {/* 🟠 Glowing Orbs */}
       <motion.div
         className="absolute top-10 left-10 w-64 h-64 bg-[#e16928ff]/25 rounded-full blur-3xl"
-        animate={{
-          x: [0, 30, -20, 0],
-          y: [0, 20, -20, 0],
-          opacity: [0.5, 0.8, 0.6, 0.5],
-        }}
-        transition={{ duration: 12, repeat: Infinity }}
+        animate={{ x: [0, 30, -20, 0], y: [0, 20, -20, 0], opacity: [0.5, 0.8, 0.6, 0.5] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-10 right-10 w-72 h-72 bg-yellow-400/25 rounded-full blur-3xl"
-        animate={{
-          x: [0, -30, 20, 0],
-          y: [0, -20, 20, 0],
-          opacity: [0.4, 0.7, 0.5, 0.4],
-        }}
-        transition={{ duration: 11, repeat: Infinity }}
+        animate={{ x: [0, -30, 20, 0], y: [0, -20, 20, 0], opacity: [0.4, 0.7, 0.5, 0.4] }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Section Header */}
       <motion.h2
         className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text
                    bg-gradient-to-r from-[#e16928ff] to-yellow-400 mb-12 tracking-wider z-10"
-        initial={{ opacity: 0, y: -50 }}
+        initial={{ opacity: 0, y: -40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: false }}
+        transition={{ duration: 1.2, ease: "easeInOut" }}
       >
         About Me
       </motion.h2>
 
-      {/* Profile + Intro */}
+      {/* Profile & Intro */}
       <div className="flex flex-col md:flex-row items-center md:items-start max-w-6xl w-full gap-12 z-10">
         <motion.div
           className="flex-shrink-0 w-80 h-80 md:w-96 md:h-96 rounded-2xl overflow-hidden border-4 border-[#e16928ff] dark:border-yellow-400 shadow-2xl"
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: false }}
+          transition={{ type: "spring", stiffness: 70, damping: 15, delay: 0.2 }}
         >
           <img
             src="https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/portfolio-background-pic.png"
             alt="Shubham Goswami"
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
           />
         </motion.div>
 
@@ -136,23 +121,22 @@ const About = () => {
           className="flex-1 space-y-6 transition-colors duration-500"
           initial={{ opacity: 0, x: 100 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          viewport={{ once: false }}
+          transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.4 }}
         >
           <TypeAnimation
             sequence={[
               "Hi, I'm Shubham Goswami 👋",
-              2000,
+              2500,
               "I'm a passionate Web Developer and Designer",
-              2000,
+              2500,
             ]}
-            speed={50}
+            speed={55}
             repeat={Infinity}
             className="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text
                        bg-gradient-to-r from-[#e16928ff] to-yellow-400"
           />
 
-          {[ 
+          {[
             "I love creating modern, responsive, and animated websites. I focus on combining creativity with clean and maintainable code.",
             "As a person, I am dedicated, detail-oriented, and always eager to learn new technologies. I enjoy solving challenging problems and improving my skills every day.",
             "I am comfortable working both independently and in team environments, and I value effective communication and collaboration.",
@@ -160,57 +144,68 @@ const About = () => {
             <motion.p
               key={i}
               className="text-lg md:text-xl text-gray-800 dark:text-gray-100 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.3 + 0.5, duration: 0.8 }}
-              viewport={{ once: false }}
+              transition={{
+                duration: 1,
+                delay: i * 0.4 + 0.5,
+                ease: "easeInOut",
+              }}
             >
               {text.split(/(modern|detail-oriented|collaboration)/g).map((word, idx) =>
                 /modern|detail-oriented|collaboration/.test(word) ? (
-                  <span key={idx} className="text-[#e16928ff] dark:text-yellow-400 font-semibold">{word}</span>
-                ) : word
+                  <span
+                    key={idx}
+                    className="text-[#e16928ff] dark:text-yellow-400 font-semibold"
+                  >
+                    {word}
+                  </span>
+                ) : (
+                  word
+                )
               )}
             </motion.p>
           ))}
         </motion.div>
       </div>
 
-      {/* Education Cards */}
+      {/* 🎓 Education Cards (Updated) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto mt-16 z-10">
         {education.map((edu, index) => {
           const miniParticles = generateMiniParticles(6);
           return (
             <motion.div
               key={edu.degree}
-              className="relative rounded-xl shadow-2xl text-center cursor-pointer
-                         bg-white dark:bg-gray-800 transition-colors duration-500 border border-transparent hover:border-yellow-400 overflow-hidden"
-              initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              className="relative rounded-2xl overflow-hidden backdrop-blur-xl border border-white/20 dark:border-gray-700/40
+                         bg-white/20 dark:bg-gray-800/30 shadow-lg hover:shadow-2xl transition-all duration-500
+                         hover:scale-[1.05] cursor-pointer"
+              initial={{ opacity: 0, y: 60, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               whileHover={{
-                scale: 1.08,
-                rotate: 1,
-                boxShadow: "0 0 25px 5px #FFD700",
+                y: -8,
+                boxShadow: "0 0 40px 6px rgba(225,105,40,0.35)",
               }}
-              transition={{ duration: 0.7, delay: index * 0.2 }}
-              viewport={{ once: false }}
+              transition={{
+                type: "spring",
+                stiffness: 80,
+                damping: 14,
+                delay: index * 0.15,
+              }}
             >
-              {/* Mini Particles */}
+              {/* Floating Mini Particles */}
               {miniParticles.map((p, i) => (
                 <motion.div
                   key={i}
-                  className="absolute rounded-full bg-yellow-300/50 dark:bg-yellow-400/40"
+                  className="absolute rounded-full bg-yellow-300/40 dark:bg-yellow-400/30"
                   style={{
                     width: `${p.size}px`,
                     height: `${p.size}px`,
                     top: `${p.y}%`,
                     left: `${p.x}%`,
                   }}
-                  animate={{
-                    y: [0, -8, 0],
-                    opacity: [0.4, 0.8, 0.4],
-                  }}
+                  animate={{ y: [0, -10, 0], opacity: [0.4, 0.9, 0.4] }}
                   transition={{
-                    duration: 3 + Math.random() * 3,
+                    duration: 6 + Math.random() * 3,
                     repeat: Infinity,
                     delay: p.delay,
                     ease: "easeInOut",
@@ -218,23 +213,23 @@ const About = () => {
                 />
               ))}
 
-              <div className="w-full h-40 rounded-t-xl overflow-hidden">
+              <div className="w-full h-44 rounded-t-2xl overflow-hidden">
                 <img
                   src={edu.img}
                   alt={edu.degree}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                 />
               </div>
+
               <div className="p-6 relative z-10">
-                <h3 className="font-bold text-xl md:text-2xl text-transparent bg-clip-text
-                               bg-gradient-to-r from-[#e16928ff] to-yellow-400 mb-2">
+                <h3 className="font-bold text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400 mb-2">
                   {edu.degree}
                 </h3>
-                <p className="text-gray-800 dark:text-gray-200 mb-2">{edu.school}</p>
+                <p className="text-gray-800 dark:text-gray-200 mb-1">{edu.school}</p>
                 <p className="font-semibold text-gray-800 dark:text-gray-100">{edu.marks}</p>
               </div>
             </motion.div>
-          )
+          );
         })}
       </div>
     </section>

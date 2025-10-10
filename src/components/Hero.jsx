@@ -16,11 +16,9 @@ const TypingEffect = ({ text, duration = 2, className }) => {
     const controls = animate(count, text.length, {
       type: "tween",
       duration,
-      ease: "linear",
+      ease: "easeInOut", // smoother easing
     });
-    const unsubscribe = displayText.onChange((latest) =>
-      setCurrentText(latest)
-    );
+    const unsubscribe = displayText.onChange((latest) => setCurrentText(latest));
     return () => {
       controls.stop();
       unsubscribe();
@@ -32,10 +30,10 @@ const TypingEffect = ({ text, duration = 2, className }) => {
       className={className}
       aria-label={text}
       aria-live="polite"
-      initial={{ opacity: 0, y: -40 }}
+      initial={{ opacity: 0, y: -30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
     >
       {currentText}
     </motion.h2>
@@ -100,10 +98,11 @@ const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex flex-col justify-center items-center text-center 
-                        bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black
-                        relative overflow-hidden px-6 transition-all duration-700">
-
+    <section
+      className="min-h-screen flex flex-col justify-center items-center text-center 
+                 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black
+                 relative overflow-hidden px-6 transition-all duration-700"
+    >
       {/* Floating Glowing Particles */}
       {particles.map((p, i) => (
         <motion.div
@@ -117,10 +116,10 @@ const Hero = () => {
           }}
           animate={{
             y: [0, -15, 0],
-            opacity: [0.6, 1, 0.6],
+            opacity: [0.5, 1, 0.5],
           }}
           transition={{
-            duration: 4 + Math.random() * 4,
+            duration: 6 + Math.random() * 3, // slower & smoother
             repeat: Infinity,
             delay: p.delay,
             ease: "easeInOut",
@@ -132,20 +131,20 @@ const Hero = () => {
       <motion.div
         className="absolute top-10 left-10 w-64 h-64 bg-orange-200/40 dark:bg-[#e16928ff]/25 rounded-full blur-3xl"
         animate={{
-          x: [0, 30, -20, 0],
+          x: [0, 25, -25, 0],
           y: [0, 20, -20, 0],
           opacity: [0.5, 0.8, 0.6, 0.5],
         }}
-        transition={{ duration: 10, repeat: Infinity }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-10 right-10 w-72 h-72 bg-yellow-200/30 dark:bg-yellow-400/25 rounded-full blur-3xl"
         animate={{
-          x: [0, -30, 20, 0],
+          x: [0, -25, 25, 0],
           y: [0, -20, 20, 0],
           opacity: [0.4, 0.7, 0.5, 0.4],
         }}
-        transition={{ duration: 9, repeat: Infinity }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Typing Title */}
@@ -161,45 +160,49 @@ const Hero = () => {
       <motion.p
         className="mt-6 text-lg md:text-2xl text-gray-800 dark:text-gray-200 
                    max-w-2xl font-medium leading-relaxed z-10"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false }}
-        transition={{ delay: 0.5, duration: 0.8 }}
+        transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
       >
         A passionate Web Developer who loves building{" "}
         <span className="font-semibold text-yellow-500">modern, responsive</span>{" "}
         and{" "}
-        <span className="font-semibold text-orange-500 dark:text-[#e16928ff]">animated websites</span>.
+        <span className="font-semibold text-orange-500 dark:text-[#e16928ff]">
+          animated websites
+        </span>
+        .
       </motion.p>
 
       {/* Buttons */}
       <motion.div
         className="mt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 z-10"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false }}
-        transition={{ delay: 1, duration: 0.8 }}
+        transition={{ delay: 1, duration: 1, ease: "easeOut" }}
       >
-        {[{ label: "View Projects", href: "#projects" },
-          { label: "Contact Me", href: "#contact" }].map((btn, idx) => (
-          <motion.a
-            key={idx}
-            href={btn.href}
-            className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
-                       text-white font-semibold rounded-lg shadow-lg hover:brightness-110 hover:scale-105 
-                       transition-transform duration-300"
-            whileHover={{ scale: 1.05 }}
-          >
-            {btn.label}
-          </motion.a>
+        {[{ label: "View Projects", href: "#projects" }].map((btn, idx) => (
+         <motion.a
+  key={idx}
+  href={btn.href}
+  className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
+  text-white font-semibold rounded-lg shadow-lg hover:brightness-110 hover:scale-105 
+  transition-transform duration-300 no-underline hover:no-underline"
+  whileHover={{ scale: 1.06 }}
+>
+  {btn.label}
+</motion.a>
+
         ))}
 
         <motion.button
           onClick={() => setShowPopup(true)}
           className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
-                     text-white font-semibold rounded-lg shadow-lg hover:brightness-110 hover:scale-105 
-                     transition-transform duration-300"
-          whileHover={{ scale: 1.05 }}
+                     text-white font-semibold rounded-lg shadow-lg 
+                     hover:brightness-110 hover:scale-105 
+                     transition-transform duration-500 ease-in-out"
+          whileHover={{ scale: 1.06 }}
         >
           Download Resume
         </motion.button>
@@ -207,15 +210,12 @@ const Hero = () => {
 
       {/* Scroll Icon */}
       <motion.div
-        className="absolute bottom-10 text-4xl text-yellow-500 animate-bounce z-10"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false }}
+        className="absolute bottom-10 text-4xl text-yellow-500 z-10"
+        animate={{ y: [0, 10, 0], opacity: [1, 0.7, 1] }}
         transition={{
-          delay: 1.5,
-          duration: 0.8,
+          duration: 2,
           repeat: Infinity,
-          repeatType: "reverse",
+          ease: "easeInOut",
         }}
       >
         <ChevronDown size={40} />
@@ -228,16 +228,17 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
         >
           <motion.div
             className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative 
                        border border-gray-200 dark:border-yellow-400/30"
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           >
             <button
-              className="absolute top-4 right-4 text-gray-700 dark:text-gray-300 font-bold text-xl hover:scale-110 transition"
+              className="absolute top-4 right-4 text-gray-700 dark:text-gray-300 font-bold text-xl hover:scale-110 transition-transform"
               onClick={() => setShowPopup(false)}
             >
               ✕
@@ -252,8 +253,9 @@ const Hero = () => {
                 className="text-green-500 font-semibold text-center py-4"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               >
-                ✅ Request sent successfully!  
+                ✅ Request sent successfully!
                 <br />You will receive confirmation soon.
               </motion.p>
             ) : (
@@ -262,7 +264,7 @@ const Hero = () => {
                 onSubmit={handleSubmit}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
               >
                 <input
                   type="text"
@@ -270,7 +272,7 @@ const Hero = () => {
                   placeholder="Your Name"
                   className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
                   bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
-                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition"
+                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
                   value={formData.name}
                   onChange={handleChange}
                   required
@@ -281,7 +283,7 @@ const Hero = () => {
                   placeholder="Your Email"
                   className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
                   bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
-                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition"
+                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -292,7 +294,7 @@ const Hero = () => {
                   rows="3"
                   className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
                   bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white resize-none 
-                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition"
+                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
                   value={formData.message}
                   onChange={handleChange}
                 />
@@ -300,7 +302,7 @@ const Hero = () => {
                   type="submit"
                   disabled={sending}
                   className="bg-gradient-to-r from-[#e16928ff] to-yellow-400 text-white dark:text-gray-900 
-                  font-semibold py-3 rounded-lg hover:brightness-110 transition duration-300"
+                  font-semibold py-3 rounded-lg hover:brightness-110 transition-all duration-500 ease-in-out"
                 >
                   {sending ? "Sending..." : "Send Request"}
                 </button>
