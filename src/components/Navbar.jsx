@@ -57,11 +57,11 @@ const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
             (link, index) => (
               <motion.li
                 key={link.name}
-                className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                  darkMode
-                    ? "text-gray-200 hover:text-sky-400"
-                    : "text-gray-900 hover:text-indigo-700"
-                }`}
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    darkMode
+                      ? "text-gray-200 hover:text-sky-400"
+                      : "text-gray-900 hover:text-indigo-700"
+                  }`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -70,9 +70,8 @@ const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
                   if (link.name === "Logout") onLogout();
                 }}
               >
-                {link.to !== "admin" ? (
                   <Link
-                    to={link.to}
+                    to={link.to !== "admin" ? link.to : ""}
                     smooth={true}
                     duration={600}
                     offset={-70}
@@ -82,17 +81,18 @@ const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
                         ? "text-sky-400 font-bold"
                         : "text-indigo-700 font-bold"
                     }
+                    onClick={
+                      link.to === "admin"
+                        ? (e) => {
+                            e.preventDefault();
+                            if (link.name === "Admin") onAdminLoginClick();
+                            if (link.name === "Logout") onLogout();
+                          }
+                        : undefined
+                    }
                   >
                     {link.name}
                   </Link>
-                ) : (
-                  <motion.span
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {link.name}
-                  </motion.span>
-                )}
               </motion.li>
             )
           )}
@@ -155,26 +155,30 @@ const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
                     if (link.name === "Logout") onLogout();
                   }}
                 >
-                  {link.to !== "admin" ? (
-                    <Link
-                      to={link.to}
-                      smooth={true}
-                      duration={600}
-                      offset={-70}
-                      spy={true}
-                      activeClass={
-                        darkMode
-                          ? "text-sky-400 font-bold"
-                          : "text-indigo-700 font-bold"
-                      }
-                    >
-                      {link.name}
-                    </Link>
-                  ) : (
-                    <motion.span whileHover={{ scale: 1.1 }}>
-                      {link.name}
-                    </motion.span>
-                  )}
+                  <Link
+                    to={link.to !== "admin" ? link.to : ""}
+                    smooth={true}
+                    duration={600}
+                    offset={-70}
+                    spy={true}
+                    activeClass={
+                      darkMode
+                        ? "text-sky-400 font-bold"
+                        : "text-indigo-700 font-bold"
+                    }
+                    onClick={
+                      link.to === "admin"
+                        ? (e) => {
+                            e.preventDefault();
+                            setIsOpen(false);
+                            if (link.name === "Admin") onAdminLoginClick();
+                            if (link.name === "Logout") onLogout();
+                          }
+                        : undefined
+                    }
+                  >
+                    {link.name}
+                  </Link>
                 </motion.li>
               )
             )}

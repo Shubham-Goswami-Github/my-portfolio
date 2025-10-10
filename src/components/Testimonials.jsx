@@ -109,7 +109,7 @@ const Testimonials = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        Achievements & Testimonials
+        Achievements
       </motion.h2>
 
       {/* Achievements Section */}
@@ -146,7 +146,7 @@ const Testimonials = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        Client & Teammate Feedback
+        Client Feedback
       </motion.h3>
 
       {/* Auto-scrolling Testimonials Carousel */}
