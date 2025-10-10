@@ -5,7 +5,7 @@ import { GiRocketThruster } from "react-icons/gi";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FaSun, FaMoon } from "react-icons/fa";
 
-const Navbar = () => {
+const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
 
@@ -52,31 +52,50 @@ const Navbar = () => {
         </motion.div>
 
         {/* Desktop Links */}
-        <ul className="hidden md:flex space-x-10 font-medium items-center">
-          {navLinks.map((link, index) => (
-            <motion.li
-              key={link.to}
-              className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                darkMode
-                  ? "text-gray-200 hover:text-sky-400"
-                  : "text-gray-900 hover:text-indigo-700"
-              }`}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link
-                to={link.to}
-                smooth={true}
-                duration={600}
-                offset={-70}
-                spy={true}
-                activeClass={darkMode ? "text-sky-400 font-bold" : "text-indigo-700 font-bold"}
+        <ul className="hidden md:flex space-x-8 font-medium items-center">
+          {[...navLinks, { name: adminLoggedIn ? "Logout" : "Admin", to: "admin" }].map(
+            (link, index) => (
+              <motion.li
+                key={link.name}
+                className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                  darkMode
+                    ? "text-gray-200 hover:text-sky-400"
+                    : "text-gray-900 hover:text-indigo-700"
+                }`}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => {
+                  if (link.name === "Admin") onAdminLoginClick();
+                  if (link.name === "Logout") onLogout();
+                }}
               >
-                {link.name}
-              </Link>
-            </motion.li>
-          ))}
+                {link.to !== "admin" ? (
+                  <Link
+                    to={link.to}
+                    smooth={true}
+                    duration={600}
+                    offset={-70}
+                    spy={true}
+                    activeClass={
+                      darkMode
+                        ? "text-sky-400 font-bold"
+                        : "text-indigo-700 font-bold"
+                    }
+                  >
+                    {link.name}
+                  </Link>
+                ) : (
+                  <motion.span
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {link.name}
+                  </motion.span>
+                )}
+              </motion.li>
+            )
+          )}
 
           {/* Theme Toggle */}
           <motion.button
@@ -120,29 +139,45 @@ const Navbar = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            {navLinks.map((link, index) => (
-              <motion.li
-                key={link.to}
-                className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                  darkMode ? "hover:text-sky-400" : "hover:text-indigo-700"
-                }`}
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 + 0.2 }}
-                onClick={() => setIsOpen(false)}
-              >
-                <Link
-                  to={link.to}
-                  smooth={true}
-                  duration={600}
-                  offset={-70}
-                  spy={true}
-                  activeClass={darkMode ? "text-sky-400 font-bold" : "text-indigo-700 font-bold"}
+            {[...navLinks, { name: adminLoggedIn ? "Logout" : "Admin", to: "admin" }].map(
+              (link, index) => (
+                <motion.li
+                  key={link.name}
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    darkMode ? "hover:text-sky-400" : "hover:text-indigo-700"
+                  }`}
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 + 0.2 }}
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (link.name === "Admin") onAdminLoginClick();
+                    if (link.name === "Logout") onLogout();
+                  }}
                 >
-                  {link.name}
-                </Link>
-              </motion.li>
-            ))}
+                  {link.to !== "admin" ? (
+                    <Link
+                      to={link.to}
+                      smooth={true}
+                      duration={600}
+                      offset={-70}
+                      spy={true}
+                      activeClass={
+                        darkMode
+                          ? "text-sky-400 font-bold"
+                          : "text-indigo-700 font-bold"
+                      }
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <motion.span whileHover={{ scale: 1.1 }}>
+                      {link.name}
+                    </motion.span>
+                  )}
+                </motion.li>
+              )
+            )}
 
             {/* Theme Toggle Mobile */}
             <motion.button
