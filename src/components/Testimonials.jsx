@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
-import Particles from "@tsparticles/react";
-import { loadFull } from "tsparticles";
-import { useCallback } from "react";
+import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { Star, Award, Users } from "lucide-react";
 
 const testimonials = [
@@ -57,74 +55,25 @@ const achievements = [
 ];
 
 const Testimonials = () => {
-  const particlesInit = useCallback(async (engine) => {
-    await loadFull(engine);
-  }, []);
+  // No particlesInit needed
 
   return (
     <section
       id="testimonials"
-      className="relative min-h-screen flex flex-col justify-center items-center px-6 py-24
-                 bg-gradient-to-b from-gray-100 via-white to-gray-200 
-                 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
-                 overflow-hidden transition-colors duration-700"
+      className="relative min-h-screen flex flex-col justify-center items-center px-6 py-24 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black overflow-hidden transition-colors duration-700"
+      style={{ minHeight: '100vh', position: 'relative' }}
     >
-      {/* Background Particles */}
-      <div className="absolute inset-0 -z-10">
-        <Particles
-          id="tsparticles-testimonials"
-          init={particlesInit}
-            options={{
-              background: { color: { value: "transparent" } },
-              fpsLimit: 120,
-              particles: {
-                number: { value: 90, density: { enable: true, area: 800 } },
-                color: { value: ["#e16928", "#fcd34d"] },
-                shape: { type: "circle" },
-                opacity: { value: 0.45, anim: { enable: true, speed: 0.5, sync: false } },
-                size: { value: { min: 2, max: 4 }, anim: { enable: true, speed: 2, sync: false } },
-                move: {
-                  enable: true,
-                  speed: 1.1,
-                  direction: "none",
-                  random: true,
-                  straight: false,
-                  outModes: { default: "out" },
-                  attract: { enable: false },
-                },
-                links: {
-                  enable: true,
-                  color: "#e16928",
-                  distance: 130,
-                  opacity: 0.22,
-                  width: 1.2,
-                  shadow: { enable: true, color: "#e16928", blur: 2 },
-                },
-              },
-              interactivity: {
-                events: {
-                  onHover: { enable: true, mode: "grab" },
-                  onClick: { enable: true, mode: "push" },
-                  resize: true,
-                },
-                modes: {
-                  grab: { distance: 160, line_linked: { opacity: 0.35 } },
-                  push: { quantity: 4 },
-                  repulse: { distance: 120, duration: 0.5 },
-                },
-              },
-              detectRetina: true,
-            }}
-        />
+      {/* Animated Planets & Stars Background - covers full section */}
+      <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}>
+        <AnimatedPlanetStarBackground />
       </div>
 
       {/* Section Header */}
       <motion.h2
-        className="text-5xl md:text-6xl font-bold text-[#e16928] dark:text-yellow-400 
-                   text-center mb-20 tracking-wide drop-shadow-lg relative z-10"
+        className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400 text-center mb-20 tracking-wide drop-shadow-lg relative z-10"
         initial={{ opacity: 0, y: -50 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 1.2, ease: 'easeInOut' }}
       >
         Achievements
       </motion.h2>
@@ -132,23 +81,21 @@ const Testimonials = () => {
       {/* Achievements Section */}
       <motion.div
         className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto relative z-10"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        initial="hidden"
+        whileInView="visible"
+        variants={{ hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.18, duration: 1.1 } } }}
       >
         {achievements.map((a, index) => (
           <motion.div
             key={index}
-            className="flex flex-col items-center text-center bg-white/20 dark:bg-gray-800/30 
-                       p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 
-                       hover:shadow-[0_0_25px_rgba(225,105,40,0.5)] transition-all duration-700"
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="flex flex-col items-center text-center bg-white/30 dark:bg-gray-800/40 p-8 rounded-2xl shadow-lg border border-yellow-400/30 dark:border-yellow-400/40 hover:shadow-[0_0_35px_rgba(225,105,40,0.5)] transition-all duration-700"
+            initial={{ opacity: 0, y: 50, scale: 0.92 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ delay: index * 0.2, duration: 0.7 }}
+            whileHover={{ scale: 1.07, boxShadow: "0 0 60px 0 #e16928" }}
+            transition={{ delay: index * 0.18, duration: 0.9, ease: 'easeInOut' }}
           >
             {a.icon}
-            <h4 className="text-2xl font-bold mt-4 mb-2 text-[#e16928] dark:text-yellow-400">
+            <h4 className="text-2xl font-bold mt-4 mb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400">
               {a.title}
             </h4>
             <p className="text-gray-700 dark:text-gray-300">{a.description}</p>
@@ -158,10 +105,10 @@ const Testimonials = () => {
 
       {/* Testimonials Header */}
       <motion.h3
-        className="text-4xl font-bold text-[#e16928] dark:text-yellow-400 mt-24 mb-16 text-center z-10"
+        className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400 mt-24 mb-16 text-center z-10"
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 1.1, ease: 'easeInOut' }}
       >
         Client Feedback
       </motion.h3>
@@ -169,36 +116,32 @@ const Testimonials = () => {
       {/* Auto-scrolling Testimonials Carousel */}
       <div className="relative w-full overflow-hidden max-w-7xl mx-auto z-10">
         <motion.div
-            className="flex gap-10"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ repeat: Infinity, duration: 32, ease: "easeInOut" }}
+          className="flex gap-10"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ repeat: Infinity, duration: 32, ease: "linear" }}
         >
           {[...testimonials, ...testimonials].map((t, i) => (
             <motion.div
               key={i}
-              className="min-w-[320px] md:min-w-[380px] bg-white/30 dark:bg-gray-800/40 
-                         backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-2xl 
-                         shadow-lg p-8 flex flex-col items-center text-center space-y-4 
-                         hover:shadow-[0_0_35px_rgba(225,105,40,0.6)]
-                         transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                initial={{ opacity: 0, scale: 0.92 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.04 }}
-                transition={{ duration: 1.1, delay: i * 0.08, ease: "easeInOut" }}
+              className="min-w-[320px] md:min-w-[380px] bg-white/40 dark:bg-gray-800/50 backdrop-blur-xl border border-yellow-400/30 dark:border-yellow-400/40 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center space-y-4 hover:shadow-[0_0_45px_rgba(225,105,40,0.7)] transition-all duration-700"
+              initial={{ opacity: 0, scale: 0.92, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              whileHover={{ scale: 1.07, boxShadow: "0 0 60px 0 #e16928" }}
+              transition={{ duration: 1.1, delay: i * 0.07, ease: "easeInOut" }}
             >
               <motion.img
                 src={t.img}
                 alt={t.name}
-                className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-[#e16928]"
-                  initial={{ opacity: 0, y: -18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, ease: "easeInOut" }}
+                className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-yellow-400"
+                initial={{ opacity: 0, y: -18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: "easeInOut" }}
               />
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic text-lg">
                 “{t.feedback}”
               </p>
               <div>
-                <h3 className="text-xl font-semibold text-[#e16928] dark:text-yellow-400">
+                <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#e16928ff] to-yellow-400">
                   {t.name}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">{t.role}</p>

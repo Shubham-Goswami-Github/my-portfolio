@@ -81,12 +81,11 @@ const About = () => {
   return (
     <section
       id="about"
-      className="min-h-screen relative flex flex-col justify-center items-center px-6 py-20
-                 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black transition-all duration-700 overflow-hidden"
-      style={{ position: "relative" }}
+      className="min-h-screen relative flex flex-col justify-center items-center px-6 py-20 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black transition-all duration-700 overflow-hidden"
+      style={{ minHeight: '100vh', position: 'relative' }}
     >
       {/* Reusable Animated Planets & Stars Background - covers full section */}
-      <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0 }}>
+      <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}>
         <AnimatedPlanetStarBackground />
       </div>
 
@@ -176,12 +175,12 @@ const About = () => {
         </motion.div>
       </div>
 
-      {/* Education cards grid: 1 col on small, 2 cols on md+ (rectangular cards, left image + right details) */}
+      {/* Education cards grid: 1 col on small, 2 cols on md+ (image above details on mobile) */}
       <div className="max-w-6xl mx-auto mt-16 w-full grid grid-cols-1 md:grid-cols-2 gap-8 z-10">
         {education.map((edu, idx) => (
           <motion.article
             key={edu.degree}
-            className="relative flex items-stretch gap-0 bg-white/10 dark:bg-black/10 border border-yellow-400/30 dark:border-yellow-400/40 rounded-2xl shadow-2xl overflow-hidden
+            className="relative flex flex-col md:flex-row items-stretch gap-0 bg-white/10 dark:bg-black/10 border border-yellow-400/30 dark:border-yellow-400/40 rounded-2xl shadow-2xl overflow-hidden
                        transition-transform duration-500 hover:scale-[1.04] hover:shadow-[0_0_40px_0_rgba(225,105,40,0.18)] hover:border-yellow-400"
             custom={idx}
             initial="hidden"
@@ -195,9 +194,10 @@ const About = () => {
             {/* Animated Glow on hover */}
             <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700 bg-gradient-to-r from-[#e16928ff] to-yellow-400 blur-2xl"></div>
 
-            {/* Left image area (fixed width rectangle) */}
+            {/* Image area: responsive for mobile and desktop */}
             <motion.div
-              className="flex-shrink-0 w-36 md:w-44 h-36 md:h-auto"
+              className="w-full md:w-48 h-44 md:h-auto flex-shrink-0 flex items-center justify-center bg-white/5 dark:bg-black/10"
+              style={{ minHeight: 160, height: 'auto' }}
               initial="hidden"
               whileInView="visible"
               variants={imageVariant}
@@ -208,11 +208,20 @@ const About = () => {
               <img
                 src={edu.img}
                 alt={`${edu.degree} photo`}
-                className="w-full h-full object-cover object-center block rounded-xl shadow-lg"
+                className="w-full h-full object-cover object-center block rounded-xl shadow-lg md:rounded-none md:rounded-l-2xl"
+                style={{
+                  maxHeight: 180,
+                  minHeight: 120,
+                  width: '100%',
+                  objectFit: 'cover',
+                  height: '100%',
+                  aspectRatio: '1/1',
+                  ...(window.innerWidth >= 768 ? { minHeight: '100%', height: '100%' } : {})
+                }}
               />
             </motion.div>
 
-            {/* Right details area */}
+            {/* Details area */}
             <motion.div
               className="p-5 flex-1 flex flex-col justify-between"
               initial="hidden"

@@ -74,10 +74,10 @@ const Projects = () => {
     <section
       id="projects"
       className="relative flex flex-col items-center px-6 py-20 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black transition-colors duration-700 overflow-hidden"
-      style={{ minHeight: "100vh", height: "auto", position: "relative" }}
+      style={{ minHeight: "100vh", position: "relative" }}
     >
       {/* Animated Planets & Stars Background - covers full section */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, width: "100%", minHeight: "100vh", height: "100%", zIndex: 0, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}>
         <AnimatedPlanetStarBackground />
       </div>
 

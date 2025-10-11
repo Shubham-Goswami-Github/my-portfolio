@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { FaGithub, FaLinkedin, FaTwitter, FaInstagram, FaRobot } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
@@ -15,30 +16,19 @@ const Footer = () => {
 
   return (
     <motion.footer
-      className="relative bg-gradient-to-r from-gray-100 via-white to-gray-200 
-                 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 
-                 text-gray-800 dark:text-gray-300 pt-16 pb-8 px-6 overflow-hidden transition-colors duration-500"
+      className="relative bg-gradient-to-r from-gray-100 via-white to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-300 pt-16 pb-8 px-6 overflow-hidden transition-colors duration-500"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
       viewport={{ once: false }}
     >
-      {/* Floating Background Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute w-48 h-48 bg-[#e16928ff]/20 dark:bg-yellow-400/20 rounded-full blur-3xl top-10 left-10"
-          animate={{ y: [0, 30, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute w-56 h-56 bg-pink-400/20 dark:bg-orange-400/20 rounded-full blur-3xl bottom-10 right-10"
-          animate={{ y: [0, -30, 0], scale: [1, 1.15, 1] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        />
+      {/* Animated Planets & Stars Background - covers full footer */}
+      <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}>
+        <AnimatedPlanetStarBackground />
       </div>
 
       {/* Footer Grid */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
         {/* About Section */}
         <motion.div
           className="space-y-4"
@@ -63,16 +53,19 @@ const Footer = () => {
         >
           <h3 className="text-2xl font-bold text-[#e16928ff] dark:text-yellow-400">Quick Links</h3>
           <ul className="space-y-2">
-            {["about", "skills", "projects", "contact"].map((link, i) => (
+            {[
+              { label: "Home", href: "#home" },
+              { label: "About", href: "#about" },
+              { label: "Skills", href: "#skills" },
+              { label: "Projects", href: "#projects" },
+              { label: "Testimonials", href: "#testimonials" },
+            ].map((link, i) => (
               <motion.li key={i} whileHover={{ x: 5, scale: 1.05 }} transition={{ type: "spring", stiffness: 200 }}>
                 <a
-                  href={`#${link}`}
-                  className="relative inline-block px-1 font-medium text-gray-700 dark:text-gray-300 
-            transition-all duration-300 hover:text-[#e16928ff] dark:hover:text-yellow-400 
-          no-underline hover:no-underline decoration-none"
-                             
+                  href={link.href}
+                  className="relative inline-block px-1 font-medium text-gray-700 dark:text-gray-300 transition-all duration-300 hover:text-[#e16928ff] dark:hover:text-yellow-400 no-underline hover:no-underline decoration-none"
                 >
-                  {link.charAt(0).toUpperCase() + link.slice(1)}
+                  {link.label}
                   <motion.span
                     className="absolute left-0 bottom-0 h-[2px] w-0 bg-[#e16928ff] dark:bg-yellow-400 rounded-full"
                     whileHover={{ width: "100%" }}
@@ -82,19 +75,6 @@ const Footer = () => {
               </motion.li>
             ))}
           </ul>
-        </motion.div>
-
-        {/* Contact Info */}
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <h3 className="text-2xl font-bold text-[#e16928ff] dark:text-yellow-400">Contact Info</h3>
-          <p>Email: <span className="text-[#e16928ff] dark:text-yellow-400">shubham@example.com</span></p>
-          <p>Phone: <span className="text-[#e16928ff] dark:text-yellow-400">+91 1234567890</span></p>
-          <p>Location: Ranchi, Jharkhand, India</p>
         </motion.div>
 
         {/* Social Media */}
@@ -130,8 +110,7 @@ const Footer = () => {
 
       {/* Total Visitors Box */}
       <motion.div
-        className="absolute bottom-6 right-6 bg-white/30 dark:bg-black/30 backdrop-blur-xl 
-                   px-6 py-4 rounded-2xl shadow-lg flex items-center space-x-3 border border-gray-300/20 dark:border-gray-700/40"
+        className="absolute bottom-6 right-6 bg-white/30 dark:bg-black/30 backdrop-blur-xl px-6 py-4 rounded-2xl shadow-lg flex items-center space-x-3 border border-gray-300/20 dark:border-gray-700/40"
         initial={{ opacity: 0, scale: 0.8 }}
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.8 }}
