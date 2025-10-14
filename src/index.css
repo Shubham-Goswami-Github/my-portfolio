@@ -18,3 +18,11 @@ p {
 a {
   @apply text-accent hover:underline transition;
 }
+
+/* Theme-aware background for AnimatedPlanetStarBackground */
+.portfolio-bg {
+  --portfolio-bg: #fff;
+}
+.dark .portfolio-bg {
+  --portfolio-bg: #10131a;
+}

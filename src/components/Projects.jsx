@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { FaGithub, FaExternalLinkAlt, FaFileDownload } from "react-icons/fa";
+import { useContext, useEffect } from "react";
+import { LenisContext } from "../LenisProvider";
 
 // 🧩 Project Data
 const projects = [
@@ -67,8 +69,13 @@ const projects = [
   },
 ];
 
-const Projects = () => {
-  // ...existing code...
+const Projects = (props) => {
+  const lenisRef = useContext(LenisContext);
+  useEffect(() => {
+    if (lenisRef && lenisRef.current) {
+      lenisRef.current.scrollTo(window.scrollY, { immediate: true });
+    }
+  }, [lenisRef]);
 
   return (
     <section

@@ -1,9 +1,17 @@
 import { motion } from "framer-motion";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { FaGithub, FaLinkedin, FaTwitter, FaInstagram, FaRobot } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { LenisContext } from "../LenisProvider";
 
-const Footer = () => {
+const Footer = (props) => {
+  const lenisRef = useContext(LenisContext);
+  useEffect(() => {
+    if (lenisRef && lenisRef.current) {
+      lenisRef.current.scrollTo(window.scrollY, { immediate: true });
+    }
+  }, [lenisRef]);
+
   const [visitors, setVisitors] = useState(0);
 
   // 🧠 Fake visitor counter logic (replace with API later if needed)

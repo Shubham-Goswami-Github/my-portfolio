@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
-import { useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
+import { LenisContext } from "../LenisProvider";
 
 const skills = [
   { name: "HTML", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/html.png" },
@@ -13,8 +14,13 @@ const skills = [
   { name: "Python", img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/pythone.png" },
 ];
 
-const Skills = () => {
-  // Remove local particles, use global animated background
+const Skills = (props) => {
+  const lenisRef = useContext(LenisContext);
+  useEffect(() => {
+    if (lenisRef && lenisRef.current) {
+      lenisRef.current.scrollTo(window.scrollY, { immediate: true });
+    }
+  }, [lenisRef]);
 
   return (
     <section

@@ -1,11 +1,11 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { db, serverTimestamp } from "../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
-import { useRef } from "react";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
+import { LenisContext } from "../LenisProvider";
 
 // Typing Animation Component
 const TypingEffect = ({ text, duration = 2, className }) => {
@@ -71,24 +71,18 @@ const TypingEffect = ({ text, duration = 2, className }) => {
 };
 
 // Main Hero Section
-const Hero = () => {
+const Hero = (props) => {
+  const lenisRef = useContext(LenisContext);
+  useEffect(() => {
+    if (lenisRef && lenisRef.current) {
+      lenisRef.current.scrollTo(window.scrollY, { immediate: true });
+    }
+  }, [lenisRef]);
+
   const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [particles, setParticles] = useState([]);
-
-  // Floating glowing particles
-  useEffect(() => {
-    const count = 30;
-    const arr = Array.from({ length: count }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 6 + 3,
-      delay: Math.random() * 5,
-    }));
-    setParticles(arr);
-  }, []);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
