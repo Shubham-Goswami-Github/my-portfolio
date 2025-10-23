@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { useContext, useEffect } from "react";
 import { LenisContext } from "../LenisProvider";
@@ -16,6 +16,7 @@ const skills = [
 
 const Skills = (props) => {
   const lenisRef = useContext(LenisContext);
+  const shouldReduceMotion = useReducedMotion();
   useEffect(() => {
     if (lenisRef && lenisRef.current) {
       lenisRef.current.scrollTo(window.scrollY, { immediate: true });
@@ -66,10 +67,7 @@ const Skills = (props) => {
                    bg-gradient-to-r from-[#e16928ff] to-yellow-400 mb-20 tracking-wide z-10"
         initial={{ opacity: 0, y: -40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 1.2,
-          ease: [0.42, 0, 0.58, 1],
-        }}
+        transition={ shouldReduceMotion ? { duration: 0.5, ease: 'easeOut' } : { duration: 0.9, ease: [0.42, 0, 0.58, 1] } }
         viewport={{ once: false }}
       >
         Skills
@@ -86,22 +84,12 @@ const Skills = (props) => {
                        bg-white/20 dark:bg-black/20 backdrop-blur-xl
                        shadow-xl border border-gray-200 dark:border-gray-700
                        hover:border-yellow-400 transition-all duration-700"
-            initial={{ opacity: 0, y: 80, scale: 0.85, rotate: -6 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-            whileHover={{
-              scale: 1.13,
-              rotate: 4,
-              boxShadow: "0 0 45px 12px rgba(255,215,0,0.5)",
-              filter: "brightness(1.08) blur(0.5px)",
-            }}
-            transition={{
-              duration: 0.9,
-              delay: index * 0.12,
-              type: "spring",
-              stiffness: 120,
-              damping: 14,
-            }}
+            initial={{ opacity: 0, y: 40, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={ shouldReduceMotion ? { scale: 1.03 } : { scale: 1.08 } }
+            transition={ shouldReduceMotion ? { duration: 0.45, ease: 'easeOut', delay: index * 0.04 } : { duration: 0.6, ease: 'easeOut', delay: index * 0.06 } }
             viewport={{ once: false }}
+            style={{ willChange: 'transform, opacity' }}
           >
             {/* Smooth Glow Background on hover */}
             <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 
@@ -114,17 +102,12 @@ const Skills = (props) => {
               alt={skill.name}
               className="w-20 h-20 object-contain z-10 relative drop-shadow-xl 
                          group-hover:scale-125 group-hover:rotate-6 transition-transform duration-500"
-              initial={{ opacity: 0, y: -30, rotate: -12 }}
-              whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-              whileHover={{ scale: 1.25, rotate: 6 }}
-              transition={{
-                delay: index * 0.15 + 0.2,
-                duration: 0.7,
-                type: "spring",
-                stiffness: 110,
-                damping: 12,
-              }}
+              initial={{ opacity: 0, y: -18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={ shouldReduceMotion ? { scale: 1.05 } : { scale: 1.12 } }
+              transition={ shouldReduceMotion ? { duration: 0.35, delay: index * 0.06 } : { duration: 0.55, delay: index * 0.08 } }
               viewport={{ once: false }}
+              style={{ willChange: 'transform, opacity' }}
             />
 
             {/* Skill Name */}
@@ -132,8 +115,8 @@ const Skills = (props) => {
               className="text-xl md:text-2xl tracking-wide z-10 relative"
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
-              whileHover={{ color: "#e16928", textShadow: "0 0 18px #fcd34d" }}
-              transition={{ duration: 0.5, delay: index * 0.13 + 0.3 }}
+              whileHover={ shouldReduceMotion ? {} : { color: "#e16928" } }
+              transition={ shouldReduceMotion ? { duration: 0.28, delay: index * 0.04 } : { duration: 0.45, delay: index * 0.06 } }
               viewport={{ once: false }}
             >
               {skill.name}

@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import emailjs from "@emailjs/browser";
@@ -14,6 +14,7 @@ const TypingEffect = ({ text, duration = 2, className }) => {
   const displayText = useTransform(rounded, (latest) => text.slice(0, latest));
   const [currentText, setCurrentText] = useState("");
   const [planetAnim, setPlanetAnim] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   // Listen for planet passing event from canvas
   useEffect(() => {
@@ -39,26 +40,47 @@ const TypingEffect = ({ text, duration = 2, className }) => {
     };
   }, [count, displayText, text, duration]);
 
+  // split into characters for per-character mount animation
+  const chars = Array.from(currentText || "");
   return (
     <motion.h2
-      className={className + " font-extrabold font-[Montserrat,Inter,sans-serif] relative"}
+      className={className + " font-extrabold font-[Montserrat,Inter,sans-serif] relative leading-tight"}
       aria-label={text}
       aria-live="polite"
-      initial={{ opacity: 0, y: -30 }}
+      initial={{ opacity: 0, y: -18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false }}
-      animate={planetAnim ? { scale: 1.08, textShadow: "0 0 32px #fcd34d" } : { scale: 1, textShadow: "0 0 0px #fcd34d" }}
-      transition={{ duration: planetAnim ? 0.6 : 1.2, ease: "easeOut" }}
+      animate={planetAnim ? { scale: 1.03, textShadow: "0 0 24px rgba(252,211,77,0.9)" } : { scale: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       style={{
         background: "linear-gradient(90deg,#e16928,#fcd34d,#38bdf8)",
         backgroundSize: "200% 200%",
         backgroundClip: "text",
         WebkitBackgroundClip: "text",
         color: "transparent",
-        animation: "gradientMove 3s ease-in-out infinite",
+        // keep subtle gradient movement unless reduced motion
+        animation: shouldReduceMotion ? undefined : "gradientMove 3s ease-in-out infinite",
+        display: "inline-block",
+        whiteSpace: "pre-wrap",
       }}
     >
-      {currentText}
+      {/* Render each character as an animated span to create a split-typing effect */}
+      {chars.map((ch, i) => (
+        <motion.span
+          key={i}
+          style={{ display: "inline-block" }}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: shouldReduceMotion ? 0.12 : 0.26,
+            delay: shouldReduceMotion ? i * 0.01 : i * 0.03,
+            ease: "easeOut",
+          }}
+        >
+          {ch === " " ? "\u00A0" : ch}
+        </motion.span>
+      ))}
+
       <style>{`
         @keyframes gradientMove {
           0% { background-position: 0% 50%; }

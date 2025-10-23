@@ -1,8 +1,9 @@
 import React from "react";
 
-
+// Minimal theme-aware background component (no animations or effects)
 const AnimatedPlanetStarBackground = () => (
   <div
+    className="portfolio-bg"
     style={{
       position: "absolute",
       inset: 0,
@@ -11,21 +12,10 @@ const AnimatedPlanetStarBackground = () => (
       zIndex: 0,
       pointerEvents: "none",
       background: "var(--portfolio-bg, #fff)",
-      transition: "background 0.4s cubic-bezier(.4,0,.2,1)",
+      transition: "background 0.25s ease",
     }}
-    className="portfolio-bg"
   />
 );
 
 export default AnimatedPlanetStarBackground;
-
-// Add theme-aware background color via CSS
-// In your global CSS (e.g., index.css or App.css), add:
-//
-// .portfolio-bg {
-//   --portfolio-bg: #fff;
-// }
-// .dark .portfolio-bg {
-//   --portfolio-bg: #10131a;
-// }
 
