@@ -7,10 +7,10 @@ const AdminDashboard = () => {
   const [requests, setRequests] = useState([]);
 
   const API_URL =
-  import.meta.env.MODE === "development"
+  process.env.NODE_ENV === "development"
     ? "https://myportfoliosg8990.vercel.app/api/sendMail"
     : "/api/sendMail";
- // ✅ Backend URL
+
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
