@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       Messages: [
         {
           From: {
-            Email: "your-email@example.com",
+            Email: "qis2k2535@gmail.com",
             Name: "Portfolio Admin",
           },
           To: [{ Email: email, Name: name }],
