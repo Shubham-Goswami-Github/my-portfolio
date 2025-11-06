@@ -19,15 +19,15 @@ export default async function handler(req, res) {
       : "❌ Resume Request Denied";
 
     const textContent = isApproved
-      ? `Hello ${name},\nYour resume request is approved.\nDownload here: https://yourwebsite.com/Resume.pdf`
-      : `Hello ${name},\nSorry, your resume request was not approved.`;
+      ? `Hey there..!  ${name},\nYour resume request is approved.\nDownload here: https://drive.google.com/file/d/1t2OyqQyQj5Aq0HWwgjVFytAXPq1XTTak/view?usp=drive_link`
+      : `Hey there..! ${name},\nSorry, your resume request was not approved.`;
 
     await mj.post("send", { version: "v3.1" }).request({
       Messages: [
         {
           From: {
             Email: "qis2k2535@gmail.com",
-            Name: "Portfolio Admin",
+            Name: "Shubham Portfolio Admin",
           },
           To: [{ Email: email, Name: name }],
           Subject: subject,

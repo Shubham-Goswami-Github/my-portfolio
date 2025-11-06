@@ -5,6 +5,7 @@ import axios from "axios";
 
 const AdminDashboard = () => {
   const [requests, setRequests] = useState([]);
+  const [filter, setFilter] = useState("Pending"); // ✅ Sidebar filter
 
   const API_URL =
     process.env.NODE_ENV === "development"
@@ -16,7 +17,7 @@ const AdminDashboard = () => {
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-        name: doc.data().Sname,   // ✅ FIX NAME FIELD HERE
+        name: doc.data().Sname,
       }));
       setRequests(data);
     });
@@ -39,39 +40,113 @@ const AdminDashboard = () => {
     alert(`❌ Request Denied and Email sent to ${email}`);
   };
 
+  const filteredRequests = requests.filter((r) => r.status === filter);
+
   return (
-    <div className="min-h-screen p-6 bg-gray-100 dark:bg-gray-900 transition-colors">
-      <h2 className="text-3xl font-bold text-[#e16928ff] dark:text-yellow-400 mb-6 text-center">
-        Resume Requests Dashboard
-      </h2>
+    <div className="min-h-screen flex bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-white">
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {requests.map((req) => (
-          <div key={req.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 hover:scale-105 transition-transform duration-300">
-            <h3 className="text-xl font-semibold mb-2 dark:text-white">{req.name}</h3>
+      {/* ✅ SIDEBAR */}
+      <div className="w-64 bg-white/10 backdrop-blur-xl border-r border-white/20 p-6 flex flex-col space-y-6">
+        <h2 className="text-2xl font-bold text-yellow-300">Dashboard</h2>
 
-            <p className="text-gray-700 dark:text-gray-300 mb-1"><strong>Email:</strong> {req.email}</p>
-            <p className="text-gray-700 dark:text-gray-300 mb-1"><strong>Message:</strong> {req.message || "No message"}</p>
+        <button
+          className={`text-left px-4 py-2 rounded-lg transition font-semibold ${
+            filter === "Pending"
+              ? "bg-yellow-400 text-black"
+              : "hover:bg-white/10 text-gray-300"
+          }`}
+          onClick={() => setFilter("Pending")}
+        >
+          Pending Requests
+        </button>
 
-            <p className={`mb-4 font-semibold ${
-              req.status === "Approved" ? "text-green-500" :
-              req.status === "Denied" ? "text-red-500" : "text-yellow-500"
-            }`}>
-              Status: {req.status}
+        <button
+          className={`text-left px-4 py-2 rounded-lg transition font-semibold ${
+            filter === "Approved"
+              ? "bg-green-400 text-black"
+              : "hover:bg-white/10 text-gray-300"
+          }`}
+          onClick={() => setFilter("Approved")}
+        >
+          Approved Requests
+        </button>
+
+        <button
+          className={`text-left px-4 py-2 rounded-lg transition font-semibold ${
+            filter === "Denied"
+              ? "bg-red-400 text-black"
+              : "hover:bg-white/10 text-gray-300"
+          }`}
+          onClick={() => setFilter("Denied")}
+        >
+          Rejected Requests
+        </button>
+      </div>
+
+      {/* ✅ MAIN CONTENT */}
+      <div className="flex-1 p-10">
+        <h1 className="text-center text-4xl font-extrabold tracking-wide mb-10 bg-gradient-to-r from-yellow-300 to-orange-400 text-transparent bg-clip-text">
+          {filter} Requests
+        </h1>
+
+        <div className="max-w-6xl mx-auto grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {filteredRequests.length === 0 && (
+            <p className="text-center opacity-60 text-lg col-span-full">
+              No {filter.toLowerCase()} requests.
             </p>
+          )}
 
-            {req.status === "Pending" && (
-              <div className="flex space-x-2">
-                <button onClick={() => handleApprove(req.id, req.name, req.email)} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:brightness-110 transition">Approve</button>
-                <button onClick={() => handleDeny(req.id, req.name, req.email)} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:brightness-110 transition">Deny</button>
+          {filteredRequests.map((req) => (
+            <div
+              key={req.id}
+              className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-6 shadow-lg hover:scale-[1.03] transition-transform duration-300"
+            >
+              <h3 className="text-xl font-bold text-yellow-300">{req.name}</h3>
+
+              <p className="text-gray-200 text-sm mt-1">
+                <span className="text-gray-400">Email:</span> {req.email}
+              </p>
+
+              {req.message && (
+                <p className="text-gray-300 text-sm mt-1">
+                  <span className="text-gray-400">Message:</span> {req.message}
+                </p>
+              )}
+
+              <div className="mt-4">
+                <span
+                  className={`px-3 py-1 text-xs font-bold rounded-full
+                    ${
+                      req.status === "Approved"
+                        ? "bg-green-500/20 text-green-400 border border-green-400/40"
+                        : req.status === "Denied"
+                        ? "bg-red-500/20 text-red-400 border border-red-400/40"
+                        : "bg-yellow-500/20 text-yellow-300 border border-yellow-300/40"
+                    }`}
+                >
+                  {req.status}
+                </span>
               </div>
-            )}
 
-            {req.status !== "Pending" && (
-              <p className="text-center text-sm text-gray-500 dark:text-gray-400 italic pt-3">Request already processed</p>
-            )}
-          </div>
-        ))}
+              {req.status === "Pending" && (
+                <div className="mt-5 flex gap-3">
+                  <button
+                    onClick={() => handleApprove(req.id, req.name, req.email)}
+                    className="flex-1 py-2 rounded-lg bg-green-500 hover:bg-green-600 transition text-white font-semibold text-sm"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleDeny(req.id, req.name, req.email)}
+                    className="flex-1 py-2 rounded-lg bg-red-500 hover:bg-red-600 transition text-white font-semibold text-sm"
+                  >
+                    Deny
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
