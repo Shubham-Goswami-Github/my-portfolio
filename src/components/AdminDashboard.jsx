@@ -6,7 +6,11 @@ import axios from "axios";
 const AdminDashboard = () => {
   const [requests, setRequests] = useState([]);
 
-  const API_URL = "https://myportfoliosg8990.vercel.app/api/sendMail"; // ✅ Backend URL
+  const API_URL =
+  import.meta.env.MODE === "development"
+    ? "https://myportfoliosg8990.vercel.app/api/sendMail"
+    : "/api/sendMail";
+ // ✅ Backend URL
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
