@@ -1,4 +1,11 @@
-import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  animate,
+  useReducedMotion,
+  AnimatePresence,
+} from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import emailjs from "@emailjs/browser";
@@ -7,100 +14,93 @@ import { collection, addDoc } from "firebase/firestore";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
 import { LenisContext } from "../LenisProvider";
 
-// Typing Animation Component
-const TypingEffect = ({ text, duration = 2, className }) => {
+const TypingEffect = ({ text, duration = 2, className, startDelay = 0 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => Math.round(latest));
   const displayText = useTransform(rounded, (latest) => text.slice(0, latest));
   const [currentText, setCurrentText] = useState("");
   const [planetAnim, setPlanetAnim] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
 
-  // Listen for planet passing event from canvas
   useEffect(() => {
-    window.__planetTextAnim = () => {
-      setPlanetAnim(true);
-      setTimeout(() => setPlanetAnim(false), 600);
-    };
-    return () => {
-      window.__planetTextAnim = undefined;
-    };
+    if (typeof window !== "undefined") {
+      window.__planetTextAnim = () => {
+        setPlanetAnim(true);
+        setTimeout(() => setPlanetAnim(false), 600);
+      };
+      return () => (window.__planetTextAnim = undefined);
+    }
   }, []);
 
   useEffect(() => {
-    const controls = animate(count, text.length, {
-      type: "tween",
-      duration,
-      ease: "easeInOut",
-    });
-    const unsubscribe = displayText.onChange((latest) => setCurrentText(latest));
-    return () => {
-      controls.stop();
-      unsubscribe();
-    };
-  }, [count, displayText, text, duration]);
+    let controls;
+    let timeoutId;
+    count.set(0);
 
-  // split into characters for per-character mount animation
-  const chars = Array.from(currentText || "");
+    if (shouldReduceMotion) {
+      setCurrentText(text);
+      return;
+    } else setCurrentText("");
+
+    timeoutId = setTimeout(() => {
+      controls = animate(count, text.length, {
+        type: "tween",
+        duration,
+        ease: "easeInOut",
+      });
+    }, startDelay * 1000);
+
+    return () => {
+      controls?.stop();
+      clearTimeout(timeoutId);
+    };
+  }, [text, duration, startDelay, shouldReduceMotion, count]);
+
+  useEffect(() => {
+    const unsubscribe = displayText.on("change", (latest) =>
+      setCurrentText(latest)
+    );
+    return () => unsubscribe();
+  }, [displayText]);
+
   return (
-    <motion.h2
-      className={className + " font-extrabold font-[Montserrat,Inter,sans-serif] relative leading-tight"}
+    <motion.h1
+      className={
+        (className || "") +
+        " font-extrabold whitespace-nowrap inline-block"
+      }
       aria-label={text}
       aria-live="polite"
-      initial={{ opacity: 0, y: -18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false }}
-      animate={planetAnim ? { scale: 1.03, textShadow: "0 0 24px rgba(252,211,77,0.9)" } : { scale: 1 }}
+      animate={planetAnim ? { scale: 1.03 } : { scale: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      style={{
-        background: "linear-gradient(90deg,#e16928,#fcd34d,#38bdf8)",
-        backgroundSize: "200% 200%",
-        backgroundClip: "text",
-        WebkitBackgroundClip: "text",
-        color: "transparent",
-        // keep subtle gradient movement unless reduced motion
-        animation: shouldReduceMotion ? undefined : "gradientMove 3s ease-in-out infinite",
-        display: "inline-block",
-        whiteSpace: "pre-wrap",
-      }}
     >
-      {/* Render each character as an animated span to create a split-typing effect */}
-      {chars.map((ch, i) => (
+      {Array.from(currentText).map((ch, i) => (
         <motion.span
           key={i}
           style={{ display: "inline-block" }}
-          initial={{ opacity: 0, y: 6 }}
+          initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            duration: shouldReduceMotion ? 0.12 : 0.26,
-            delay: shouldReduceMotion ? i * 0.01 : i * 0.03,
+            duration: shouldReduceMotion ? 0.08 : 0.16,
+            delay: shouldReduceMotion ? i * 0.005 : i * 0.01,
             ease: "easeOut",
           }}
         >
-          {ch === " " ? "\u00A0" : ch}
+          {ch}
         </motion.span>
       ))}
-
-      <style>{`
-        @keyframes gradientMove {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
-    </motion.h2>
+    </motion.h1>
   );
 };
 
-// Main Hero Section
-const Hero = (props) => {
+const Hero = () => {
   const lenisRef = useContext(LenisContext);
   useEffect(() => {
-    if (lenisRef && lenisRef.current) {
+    if (lenisRef?.current)
       lenisRef.current.scrollTo(window.scrollY, { immediate: true });
-    }
   }, [lenisRef]);
 
+  const prefersReducedMotion = useReducedMotion();
   const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -138,196 +138,83 @@ const Hero = (props) => {
       setFormData({ name: "", email: "", message: "" });
       setTimeout(() => setShowPopup(false), 4000);
     } catch (err) {
-      alert("Error submitting request: " + err.message);
+      alert(err.message);
       setSending(false);
     }
   };
 
   return (
-    <section
-      className="min-h-screen flex flex-col justify-center items-center text-center 
-                 bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black
-                 relative overflow-hidden px-6 transition-all duration-700"
-    >
-      {/* Reusable Animated Planets & Stars Background */}
+    <section className="min-h-screen flex flex-col justify-center relative overflow-hidden bg-white dark:bg-black transition-all duration-700">
       <AnimatedPlanetStarBackground />
 
-      {/* Typing Title */}
-      <TypingEffect
-        text="Hi, I'm Shubham Das Goswami"
-        duration={2}
-        className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text 
-                   bg-gradient-to-r from-[#e16928ff] to-yellow-400 
-                   font-sans tracking-wide drop-shadow-lg z-10"
-      />
-
-      {/* Subheading */}
-      <motion.p
-        className="mt-6 text-lg md:text-2xl text-gray-800 dark:text-gray-200 
-                   max-w-2xl font-medium leading-relaxed z-10"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false }}
-        transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
-      >
-        A passionate Web Developer who loves building{" "}
-        <span className="font-semibold text-yellow-500">modern, responsive</span>{" "}
-        and{" "}
-        <span className="font-semibold text-orange-500 dark:text-[#e16928ff]">
-          animated websites
-        </span>
-        .
-      </motion.p>
-
-      {/* Buttons */}
-      <motion.div
-        className="mt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 z-10"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false }}
-        transition={{ delay: 1, duration: 1, ease: "easeOut" }}
-      >
-        {[{ label: "View Projects", href: "#projects" }].map((btn, idx) => (
-         <motion.a
-  key={idx}
-  href={btn.href}
-  className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
-  text-white font-semibold rounded-lg shadow-lg hover:brightness-110 hover:scale-105 
-  transition-transform duration-300 no-underline hover:no-underline"
-  whileHover={{ scale: 1.06 }}
->
-  {btn.label}
-</motion.a>
-
-        ))}
-
-        <motion.button
-          onClick={() => setShowPopup(true)}
-          className="px-8 py-4 bg-gradient-to-r from-[#e16928ff] to-yellow-400 
-                     text-white font-semibold rounded-lg shadow-lg 
-                     hover:brightness-110 hover:scale-105 
-                     transition-transform duration-500 ease-in-out"
-          whileHover={{ scale: 1.06 }}
-        >
-          Download Resume
-        </motion.button>
-      </motion.div>
-
-      {/* Scroll Icon */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-12 items-center">
+        
+        {/* LEFT IMAGE */}
         <motion.div
-          className="absolute bottom-10 text-4xl text-yellow-500 z-10 cursor-pointer"
-          animate={{ y: [0, 10, 0], opacity: [1, 0.7, 1] }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          onClick={() => {
-            const aboutSection = document.getElementById("about");
-            if (aboutSection) {
-              aboutSection.scrollIntoView({ behavior: "smooth" });
-            }
-          }}
-        >
-          <ChevronDown size={40} />
-        </motion.div>
-
-      {/* Resume Request Popup */}
-      {showPopup && (
-        <motion.div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className="flex justify-center md:justify-start"
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
         >
           <motion.div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative 
-                       border border-gray-200 dark:border-yellow-400/30"
-            initial={{ scale: 0.85, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-80 md:h-80"
+            animate={
+              prefersReducedMotion ? { y: 0 } : { y: [0, -10, 0] }
+            }
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           >
-            <button
-              className="absolute top-4 right-4 text-gray-700 dark:text-gray-300 font-bold text-xl hover:scale-110 transition-transform"
-              onClick={() => setShowPopup(false)}
-            >
-              ✕
-            </button>
-
-            <h3 className="text-2xl font-bold mb-4 text-[#e16928ff] dark:text-yellow-400">
-              Request Resume
-            </h3>
-
-            {success ? (
-              <motion.p
-                className="text-green-500 font-semibold text-center py-4"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                ✅ Request sent successfully!
-                <br />You will receive confirmation soon.
-              </motion.p>
-            ) : (
-              <motion.form
-                className="flex flex-col space-y-4"
-                onSubmit={handleSubmit}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
-                  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
-                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Your Email"
-                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
-                  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
-                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-                <textarea
-                  name="message"
-                  placeholder="Optional message"
-                  rows="3"
-                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 
-                  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white resize-none 
-                  focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
-                  value={formData.message}
-                  onChange={handleChange}
-                />
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="bg-gradient-to-r from-[#e16928ff] to-yellow-400 text-white dark:text-gray-900 
-                  font-semibold py-3 rounded-lg hover:brightness-110 transition-all duration-500 ease-in-out"
-                >
-                  {sending ? "Sending..." : "Send Request"}
-                </button>
-              </motion.form>
-            )}
+            <div className="absolute -inset-6 rounded-full bg-gradient-to-tr from-[#e16928] via-yellow-400 to-sky-400 opacity-30 blur-2xl" />
+            <div className="absolute inset-0 rounded-full p-[3px] bg-gradient-to-br from-[#e16928] via-yellow-400 to-sky-400">
+              <img
+                src="https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/GithubProfile.jpeg"
+                className="rounded-full w-full h-full object-cover"
+              />
+            </div>
           </motion.div>
         </motion.div>
-      )}
+
+        {/* RIGHT TEXT */}
+        <div className="text-center md:text-left">
+          <motion.p className="text-2xl md:text-4xl font-semibold text-gray-700 dark:text-gray-200">
+            Hi, I'm
+          </motion.p>
+
+          <div className="mt-1 w-full overflow-hidden">
+            <div className="text-center md:text-left">
+            <div className="mt-1 w-full overflow-hidden">
+  <div className="text-center md:text-left">
+    <TypingEffect
+      text={"Shubham\u00A0Das\u00A0Goswami"}
+      duration={1.8}
+      startDelay={0.1}
+      className="inline-block 
+        text-[clamp(1.5rem,2.3vw,2.3rem)]      /* mobile */
+        sm:text-[clamp(1.9rem,2.6vw,2.7rem)]   /* sm */
+        md:text-[clamp(2.2rem,2.8vw,3rem)]     /* md/laptop */
+        lg:text-[clamp(2.4rem,2.9vw,3.2rem)]   /* large screens (reduced more) */
+        xl:text-[clamp(2.6rem,3vw,3.4rem)]     /* xl screens */
+        2xl:text-[clamp(2.8rem,3.1vw,3.6rem)]  /* ultra wide — controlled */
+        text-gray-900 dark:text-white 
+        tracking-wide leading-tight break-words w-full"
+    />
+  </div>
+</div>
+
+
+            </div>
+          </div>
+
+          <motion.p className="mt-5 text-lg md:text-2xl text-gray-700 dark:text-gray-300">
+            A passionate Web Developer crafting{" "}
+            <span className="text-yellow-500 font-semibold">modern</span> and{" "}
+            <span className="text-[#e16928] font-semibold">animated</span>{" "}
+            experiences.
+          </motion.p>
+
+        </div>
+      </div>
     </section>
   );
 };
-
-
-
-
 
 export default Hero;

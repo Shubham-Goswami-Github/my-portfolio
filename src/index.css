@@ -26,3 +26,19 @@ a {
 .dark .portfolio-bg {
   --portfolio-bg: #10131a;
 }
+
+/* Motion performance helpers */
+.motion-optim {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prefer reduced motion: disable heavy background animations */
+@media (prefers-reduced-motion: reduce) {
+  .motion-optim {
+    transition: none !important;
+    animation: none !important;
+  }
+}

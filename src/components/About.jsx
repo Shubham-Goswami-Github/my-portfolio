@@ -111,8 +111,8 @@ const EducationCard = ({ edu, idx }) => {
                  shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)]
                  transition-all duration-500 ease-out
                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e16928]/60
-                 hover:shadow-[0_12px_40px_rgba(225,105,40,0.22)] dark:hover:shadow-[0_12px_40px_rgba(225,105,40,0.35)]
-                 hover:border-[#e16928]/40"
+                 hover:shadow-[0_12px_40px_rgba(225,105,40,0.18)] dark:hover:shadow-[0_12px_40px_rgba(225,105,40,0.28)]
+                 hover:border-[#e16928]/40 motion-optim"
       custom={custom}
       initial="hidden"
       whileInView="visible"
@@ -120,7 +120,7 @@ const EducationCard = ({ edu, idx }) => {
       viewport={{ once: true, amount: 0.2 }}
       whileHover={
         !shouldReduceMotion
-          ? { y: -8, scale: 1.01, rotate: 0.15, transition: { duration: 0.3, ease: "easeOut" } }
+          ? { y: -6, scale: 1.01, rotate: 0.12, transition: { duration: 0.28, ease: "easeOut" } }
           : undefined
       }
       role="article"
@@ -141,8 +141,7 @@ const EducationCard = ({ edu, idx }) => {
 
       {/* Image Section (size unchanged) */}
       <motion.div
-        className="relative w-full h-32 sm:h-36 md:h-40 overflow-hidden 
-                   bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900"
+        className="relative w-full h-32 sm:h-36 md:h-40 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 motion-optim"
         initial="hidden"
         whileInView="visible"
         variants={imageVariant}
@@ -163,8 +162,7 @@ const EducationCard = ({ edu, idx }) => {
           src={edu.img}
           alt={edu.degree}
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover object-center
-                     transition-transform duration-700 ease-out group-hover:scale-110"
+          className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110 motion-optim"
         />
 
         {/* Corner accent */}
@@ -346,26 +344,26 @@ const About = () => {
         <AnimatedPlanetStarBackground />
       </div>
 
-      {/* Glowing orbs */}
+      {/* Glowing orbs (reduced blur and slower motion for smoother scrolling) */}
       <motion.div
         className="absolute top-10 left-5 sm:left-10 w-32 h-32 sm:w-48 sm:h-48 
-                   bg-[#e16928]/20 dark:bg-[#e16928]/15 rounded-full blur-3xl"
+                   bg-[#e16928]/20 dark:bg-[#e16928]/15 rounded-full blur-2xl motion-optim"
         animate={{
-          x: [0, 20, -15, 0],
-          y: [0, 15, -15, 0],
-          opacity: [0.3, 0.5, 0.4, 0.3],
+          x: [0, 16, -12, 0],
+          y: [0, 12, -12, 0],
+          opacity: [0.32, 0.52, 0.42, 0.32],
         }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-10 right-5 sm:right-10 w-36 h-36 sm:w-56 sm:h-56 
-                   bg-yellow-400/20 dark:bg-yellow-400/15 rounded-full blur-3xl"
+                   bg-yellow-400/20 dark:bg-yellow-400/15 rounded-full blur-2xl motion-optim"
         animate={{
-          x: [0, -20, 15, 0],
-          y: [0, -15, 15, 0],
-          opacity: [0.25, 0.45, 0.35, 0.25],
+          x: [0, -16, 12, 0],
+          y: [0, -12, 12, 0],
+          opacity: [0.28, 0.48, 0.38, 0.28],
         }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Header */}
