@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import axios from "axios"; // ✅ Using Axios now
+import axios from "axios";
 
 const AdminDashboard = () => {
   const [requests, setRequests] = useState([]);
 
-  // ✅ Live Fetch Resume Requests
+  const API_URL = "https://myportfoliosg8990.vercel.app/api/sendMail"; // ✅ Backend URL
+
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "resume_requests"),
@@ -18,11 +19,10 @@ const AdminDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // ✅ Approve Handler → Update Firestore + Send Resume Link Mail
   const handleApprove = async (id, userName, userEmail) => {
     await updateDoc(doc(db, "resume_requests", id), { status: "Approved" });
 
-    await axios.post("/api/sendMail", {
+    await axios.post(API_URL, {
       email: userEmail,
       name: userName,
       status: "Approved",
@@ -31,11 +31,10 @@ const AdminDashboard = () => {
     alert(`✅ Resume approved and Email Sent to ${userEmail}`);
   };
 
-  // ✅ Deny Handler → Update Firestore + Send Rejection Mail
   const handleDeny = async (id, userName, userEmail) => {
     await updateDoc(doc(db, "resume_requests", id), { status: "Denied" });
 
-    await axios.post("/api/sendMail", {
+    await axios.post(API_URL, {
       email: userEmail,
       name: userName,
       status: "Denied",
