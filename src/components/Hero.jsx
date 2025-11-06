@@ -199,7 +199,7 @@ const Hero = () => {
 
           <div className="mt-1">
             <TypingEffect
-              text={"Shubham\u00A0\u00A0Das\u00A0\u00A0Goswami"}
+              text={"Shubham\u00A0Das\u00A0Goswami"}
               duration={1.8}
               startDelay={0.15}
               className="

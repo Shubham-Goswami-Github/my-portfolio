@@ -4,77 +4,63 @@ import { motion } from "framer-motion";
 import { auth } from "../firebaseConfig";
 import { Lock, Mail } from "lucide-react";
 
-const AdminLogin = ({ onLogin }) => {
+const AdminLogin = ({ onLogin, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [particles, setParticles] = useState([]);
 
-  // Create glowing floating particles for background
   useEffect(() => {
-    const count = 25;
-    const arr = Array.from({ length: count }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 8 + 3,
-      delay: Math.random() * 5,
-    }));
-    setParticles(arr);
+    setParticles(
+      Array.from({ length: 35 }, () => ({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 6 + 3,
+        delay: Math.random() * 3,
+      }))
+    );
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      onLogin(true);
       setError("");
-    } catch (err) {
-      console.error(err);
-      setError("Invalid credentials or Firebase Auth not set up!");
+      onLogin(true);
+    } catch {
+      setError("❌ Invalid Email or Password");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
+    /* ✅ FULL SCREEN + BLUR + DARK OVERLAY */
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center 
+                    bg-black/80 backdrop-blur-md overflow-hidden">
 
-      {/* 🌊 Animated Wave Background (Fixed Orientation) */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-0">
-        <svg
-          className="relative block w-[calc(100%+1.3px)] h-[200px]"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-          viewBox="0 0 1200 120"
+      {/* Close Button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-6 text-white/90 text-3xl hover:text-white transition"
         >
-          <path
-            d="M985.66,92.83c-43.72,4.31-87.07,11.35-130.92,11.62-72.89.46-145.17-9.46-217.9-16.63C516.43,78.49,395,69,321.39,56.44A600.72,600.72,0,0,0,0,65.58V120H1200V95.8C1131.45,88.11,1056.87,85.6,985.66,92.83Z"
-            fill="url(#grad)"
-          />
-          <defs>
-            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#e16928ff" />
-              <stop offset="100%" stopColor="#facc15" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+          ✕
+        </button>
+      )}
 
-      {/* ✨ Floating Particles */}
+      {/* Floating Stars */}
       {particles.map((p, i) => (
         <motion.div
           key={i}
-          className="absolute rounded-full bg-yellow-400/30"
+          className="absolute rounded-full bg-white/70 shadow-lg"
           style={{
             width: `${p.size}px`,
             height: `${p.size}px`,
             top: `${p.y}%`,
             left: `${p.x}%`,
           }}
-          animate={{
-            y: [0, -15, 0],
-            opacity: [0.6, 1, 0.6],
-          }}
+          animate={{ y: [0, -14, 0], opacity: [0.4, 1, 0.4] }}
           transition={{
-            duration: 4 + Math.random() * 4,
+            duration: 3.5 + Math.random() * 3,
             repeat: Infinity,
             delay: p.delay,
             ease: "easeInOut",
@@ -82,103 +68,55 @@ const AdminLogin = ({ onLogin }) => {
         />
       ))}
 
-      {/* 🔥 Animated Glowing Orbs */}
-      <motion.div
-        className="absolute top-10 left-10 w-64 h-64 bg-[#e16928ff]/30 rounded-full blur-3xl"
-        animate={{
-          x: [0, 30, -20, 0],
-          y: [0, 20, -20, 0],
-          opacity: [0.5, 0.8, 0.6, 0.5],
-        }}
-        transition={{ duration: 10, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute bottom-10 right-10 w-72 h-72 bg-yellow-400/20 rounded-full blur-3xl"
-        animate={{
-          x: [0, -30, 20, 0],
-          y: [0, -20, 20, 0],
-          opacity: [0.4, 0.7, 0.5, 0.4],
-        }}
-        transition={{ duration: 9, repeat: Infinity }}
-      />
-
-      {/* 🧊 Login Card */}
+      {/* Login Card */}
       <motion.form
         onSubmit={handleSubmit}
-        className="relative z-10 bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 
-                   p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center"
-        initial={{ opacity: 0, scale: 0.8, y: 50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
+        className="relative z-10 w-[90%] max-w-sm bg-white/10 border border-white/20 rounded-2xl backdrop-blur-xl p-8 shadow-2xl"
+        initial={{ opacity: 0, y: 40, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <motion.h2
-          className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-[#e16928ff] to-yellow-400 text-transparent bg-clip-text"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+        <h2 className="text-4xl font-extrabold mb-6 text-center bg-gradient-to-r from-yellow-300 to-orange-400 text-transparent bg-clip-text">
           Admin Login
-        </motion.h2>
+        </h2>
 
-        {error && (
-          <motion.p
-            className="text-red-500 mb-4 text-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {error}
-          </motion.p>
-        )}
+        {error && <p className="text-red-400 text-center mb-4">{error}</p>}
 
-        {/* Email */}
-        <motion.div className="relative mb-4" whileFocusWithin={{ scale: 1.02 }}>
-          <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
+        <div className="relative mb-5">
+          <Mail className="absolute left-3 top-3 text-gray-300" size={20} />
           <input
             type="email"
-            placeholder="Email"
-            className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                       bg-gray-100/80 dark:bg-gray-700/60 text-gray-900 dark:text-white 
-                       focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
+            placeholder="Admin Email"
+            className="w-full pl-10 pr-3 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:ring-2 focus:ring-yellow-300 outline-none transition"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </motion.div>
+        </div>
 
-        {/* Password */}
-        <motion.div className="relative mb-6" whileFocusWithin={{ scale: 1.02 }}>
-          <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
+        <div className="relative mb-6">
+          <Lock className="absolute left-3 top-3 text-gray-300" size={20} />
           <input
             type="password"
             placeholder="Password"
-            className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                       bg-gray-100/80 dark:bg-gray-700/60 text-gray-900 dark:text-white 
-                       focus:ring-2 focus:ring-[#e16928ff] dark:focus:ring-yellow-400 outline-none transition-all"
+            className="w-full pl-10 pr-3 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:ring-2 focus:ring-yellow-300 outline-none transition"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </motion.div>
+        </div>
 
-        {/* Button */}
         <motion.button
-          type="submit"
-          whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(225,105,40,0.6)" }}
-          whileTap={{ scale: 0.97 }}
-          className="w-full bg-gradient-to-r from-[#e16928ff] to-yellow-400 text-white dark:text-gray-900 
-                     py-3 rounded-lg font-semibold shadow-md hover:brightness-110 transition-all duration-300"
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold rounded-lg shadow-lg hover:shadow-yellow-400/50 transition"
         >
           Login
         </motion.button>
 
-        <motion.div
-          className="mt-4 text-sm text-gray-400"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          Secure access for authorized admins only
-        </motion.div>
+        <p className="text-gray-300 text-sm text-center mt-4 opacity-60">
+          Authorized Access Only
+        </p>
       </motion.form>
     </div>
   );

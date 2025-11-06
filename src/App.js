@@ -38,25 +38,19 @@ function App() {
           <AdminDashboard />
         )}
 
-        {/* ✅ Admin Login Modal - Only shows when clicked */}
+        {/* ✅ FULL-SCREEN ADMIN LOGIN */}
+
         {showAdminModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
-            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 w-[90%] max-w-md text-gray-800 dark:text-gray-100">
-              <button
-                onClick={() => setShowAdminModal(false)}
-                className="absolute top-3 right-3 text-gray-400 hover:text-gray-200"
-              >
-                ✕
-              </button>
-              <AdminLogin
-                onLogin={(success) => {
-                  if (success) {
-                    setAdminLoggedIn(true);
-                    setShowAdminModal(false);
-                  }
-                }}
-              />
-            </div>
+          <div className="fixed inset-0 z-[9999]">
+            <AdminLogin
+              onLogin={(success) => {
+                if (success) {
+                  setAdminLoggedIn(true);
+                  setShowAdminModal(false);
+                }
+              }}
+              onClose={() => setShowAdminModal(false)}
+            />
           </div>
         )}
       </div>
