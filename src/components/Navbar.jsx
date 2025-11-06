@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-scroll";
 import { GiRocketThruster } from "react-icons/gi";
@@ -8,13 +8,16 @@ import { FaSun, FaMoon } from "react-icons/fa";
 const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
+  const [showNav, setShowNav] = useState(true);
+  const lastScrollYRef = useRef(0);
+  const hideTimeoutRef = useRef(null);
 
   const navLinks = [
     { name: "Home", to: "hero" },
     { name: "About", to: "about" },
     { name: "Skills", to: "skills" },
     { name: "Projects", to: "projects" },
-    { name: "Contact", to: "contact" },
+  
   ];
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -29,6 +32,48 @@ const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
     }
   }, [darkMode]);
 
+  // Show on scroll up or activity; hide on scroll down or inactivity
+  useEffect(() => {
+    const handleActivity = () => {
+      setShowNav(true);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = setTimeout(() => setShowNav(false), 1800);
+    };
+
+    const handleScroll = () => {
+      const currentY = window.scrollY || 0;
+      const lastY = lastScrollYRef.current;
+      const scrolledDown = currentY > lastY + 3;
+      const scrolledUp = currentY < lastY - 3;
+
+      if (scrolledDown) setShowNav(false);
+      if (scrolledUp) setShowNav(true);
+
+      lastScrollYRef.current = currentY;
+      // Any scroll is activity; reset inactivity timer
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = setTimeout(() => setShowNav(false), 3000);
+
+      // Close mobile menu when scrolling
+      if (isOpen) setIsOpen(false);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("mousemove", handleActivity, { passive: true });
+    window.addEventListener("touchmove", handleActivity, { passive: true });
+
+    // Initialize last scroll position
+    lastScrollYRef.current = window.scrollY || 0;
+    handleActivity();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("touchmove", handleActivity);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    };
+  }, [isOpen]);
+
   return (
     <motion.nav
       className={`fixed top-0 left-0 w-full z-50 backdrop-blur-md shadow-lg transition-colors duration-500 ${
@@ -37,8 +82,8 @@ const Navbar = ({ onAdminLoginClick, adminLoggedIn, onLogout }) => {
           : "bg-gradient-to-r from-blue-100 to-indigo-200/80"
       }`}
       initial={{ y: -120 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
+      animate={{ y: showNav ? 0 : -120, opacity: showNav ? 1 : 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
