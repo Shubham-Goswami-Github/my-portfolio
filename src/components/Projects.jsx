@@ -7,6 +7,22 @@ import { LenisContext } from "../LenisProvider";
 // 🧩 Project Data
 const projects = [
   {
+    title: "Universal Ecommerce Site",
+    description:
+      "A fully responsive, modern ecommerce platform supporting product browsing, cart system, authentication, and secure order handling. Built with a MERN stack architecture and optimized for performance.",
+    learnings:
+      "Gained hands-on experience with full-stack architecture, JWT authentication, REST API development, and efficient state management in React.",
+    technologies: ["Node.js", "React", "Tailwind CSS", "MongoDB"],
+    duration: "Nov 2025 – Under Devlopment",
+    image:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/universalecommerce.png",
+    github: "https://github.com/Shubham-Goswami-Github/universal-ecommerce",
+    demo: "#",
+    readme:
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/universal-ecommerce/main/README.md",
+  },
+
+  {
     title: "Evoting System",
     description:
       "A secure digital voting platform developed with PHP, HTML, CSS, and JavaScript. Designed to ensure fairness, transparency, and a smooth user experience.",
@@ -21,6 +37,7 @@ const projects = [
     readme:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/evoting-php/main/README.md",
   },
+
   {
     title: "Daily Expense Tracker (Android)",
     description:
@@ -37,6 +54,7 @@ const projects = [
     readme:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/Android-Daily-Expense-Tracker/main/README.md",
   },
+
   {
     title: "Unstop Clone Project",
     description:
@@ -52,6 +70,7 @@ const projects = [
     readme:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/unstop-clone/main/README.md",
   },
+
   {
     title: "Portfolio Website",
     description:
