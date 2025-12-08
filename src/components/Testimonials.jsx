@@ -5,13 +5,7 @@ import { useContext, useEffect } from "react";
 import { LenisContext } from "../LenisProvider";
 
 const testimonials = [
-	{
-		name: "Rahul Verma",
-		role: "Frontend Developer, Oasys Tech",
-		feedback:
-			"Working with Shubham was an amazing experience. His ability to convert complex UI ideas into clean and beautiful designs impressed our entire team.",
-		img: "https://randomuser.me/api/portraits/men/32.jpg",
-	},
+
 	{
 		name: "Priya Sharma",
 		role: "Project Manager, TechServe",
