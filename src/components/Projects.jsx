@@ -1,6 +1,6 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import AnimatedPlanetStarBackground from "./AnimatedPlanetStarBackground";
-import { useContext, useEffect, useState, memo, useMemo, useCallback } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LenisContext } from "../LenisProvider";
 import { 
   Sparkles, 
@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Star,
   Zap,
-  BookOpen
+  BookOpen,
+  Terminal
 } from "lucide-react";
 import { 
   FaGithub, 
@@ -38,166 +39,88 @@ import {
   SiHtml5,
   SiCss3
 } from "react-icons/si";
-import { Terminal } from "lucide-react";
 
 /* -------------------- OPTIMIZED CSS STYLES -------------------- */
-const projectsOptimizedStyles = `
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
+if (typeof document !== 'undefined') {
+  const existingStyle = document.getElementById('projects-optimized-styles');
+  if (!existingStyle) {
+    const style = document.createElement("style");
+    style.id = 'projects-optimized-styles';
+    style.innerHTML = `
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 
-@keyframes shimmer-projects {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 200% 0%; }
-}
-
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.15; transform: scale(1); }
-  50% { opacity: 0.25; transform: scale(1.03); }
-}
-
-@keyframes ping-slow {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
+      .projects-shimmer {
+        background-image: linear-gradient(90deg, #e16928, #fbbf24, #f59e0b, #e16928);
+        background-size: 200% 100%;
+        animation: projectsShimmer 4s ease-in-out infinite;
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+      
+      @keyframes projectsShimmer {
+        0%, 100% { background-position: 0% 0%; }
+        50% { background-position: 100% 0%; }
+      }
+      
+      .projects-pulse {
+        animation: projectsPulse 3s ease-in-out infinite;
+      }
+      
+      @keyframes projectsPulse {
+        0%, 100% { opacity: 0.15; transform: scale(1); }
+        50% { opacity: 0.25; transform: scale(1.03); }
+      }
+      
+      .project-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      }
+      
+      .project-card:hover {
+        transform: translateY(-8px);
+      }
+      
+      .project-card:hover .project-progress-line {
+        width: 100%;
+      }
+      
+      .project-progress-line {
+        transition: width 0.6s ease-out;
+      }
+      
+      .project-card:hover .project-image {
+        transform: scale(1.05);
+      }
+      
+      .project-image {
+        transition: transform 0.5s ease;
+      }
+      
+      .project-card:hover .project-overlay {
+        opacity: 1;
+      }
+      
+      .project-overlay {
+        transition: opacity 0.3s ease;
+      }
+      
+      .tech-tag {
+        transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+      }
+      
+      .tech-tag:hover {
+        transform: translateY(-2px);
+      }
+      
+      .action-btn {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      
+      .action-btn:hover {
+        transform: translateY(-2px);
+      }
+    `;
+    document.head.appendChild(style);
   }
-}
-
-@keyframes gradient-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.gpu-layer {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
-}
-
-.shimmer-text-projects {
-  background-image: linear-gradient(90deg, #e16928, #fbbf24, #f59e0b, #e16928);
-  background-size: 200% 100%;
-  animation: shimmer-projects 4s infinite linear;
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* Project Card Hover Effects - Pure CSS */
-.project-card {
-  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-.project-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 25px 50px rgba(225, 105, 40, 0.15);
-  border-color: rgba(225, 105, 40, 0.3);
-}
-
-.project-card:hover .project-image {
-  transform: scale(1.05);
-}
-
-.project-card:hover .project-overlay {
-  opacity: 1;
-}
-
-.project-card:hover .project-overlay-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.project-card:hover .progress-line {
-  width: 100%;
-}
-
-.project-card:hover .gradient-border {
-  opacity: 1;
-}
-
-/* Image transitions */
-.project-image {
-  transition: transform 0.5s ease;
-}
-
-/* Overlay transitions */
-.project-overlay {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.project-overlay-content {
-  transform: translateY(20px);
-  opacity: 0;
-  transition: transform 0.3s ease 0.1s, opacity 0.3s ease 0.1s;
-}
-
-/* Category Button */
-.category-btn {
-  transition: all 0.2s ease;
-}
-
-.category-btn:hover {
-  transform: scale(1.05) translateY(-2px);
-}
-
-.category-btn:active {
-  transform: scale(0.98);
-}
-
-/* Action Button */
-.action-btn {
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  transform: scale(1.05) translateY(-2px);
-}
-
-.action-btn:active {
-  transform: scale(0.98);
-}
-
-/* Stats Card */
-.stats-card {
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.stats-card:hover {
-  transform: scale(1.05) translateY(-5px);
-  border-color: rgba(225, 105, 40, 0.3);
-}
-
-/* Tech Tag */
-.tech-tag {
-  transition: all 0.2s ease;
-}
-
-.tech-tag:hover {
-  transform: scale(1.05) translateY(-2px);
-  border-color: rgba(225, 105, 40, 0.4);
-  background-color: rgba(225, 105, 40, 0.1);
-}
-
-/* Gradient border animation */
-.gradient-border-animated {
-  background: linear-gradient(135deg, #e16928, #fbbf24, #f59e0b, #e16928);
-  background-size: 300% 300%;
-  animation: gradient-flow 4s ease infinite;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-/* Progress line */
-.progress-line {
-  transition: width 0.7s ease;
-}
-`;
-
-// Inject styles once
-if (typeof document !== 'undefined' && !document.getElementById('projects-optimized-styles')) {
-  const styleSheet = document.createElement("style");
-  styleSheet.id = 'projects-optimized-styles';
-  styleSheet.innerHTML = projectsOptimizedStyles;
-  document.head.appendChild(styleSheet);
 }
 
 /* -------------------- TECH ICONS MAP -------------------- */
@@ -323,81 +246,58 @@ const projects = [
   },
 ];
 
-/* -------------------- SIMPLIFIED FLOATING BACKGROUND (CSS Only) -------------------- */
-const FloatingBackground = memo(() => (
-  <>
-    <div 
-      className="absolute w-80 h-80 rounded-full top-20 -left-40 gpu-layer"
-      style={{
-        background: "linear-gradient(to right, rgba(225, 105, 40, 0.12), rgba(251, 191, 36, 0.12))",
-        filter: "blur(50px)",
-        animation: "pulse-slow 10s ease-in-out infinite",
-      }}
-    />
-    <div 
-      className="absolute w-72 h-72 rounded-full bottom-20 -right-36 gpu-layer"
-      style={{
-        background: "linear-gradient(to right, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.08))",
-        filter: "blur(50px)",
-        animation: "pulse-slow 12s ease-in-out infinite 3s",
-      }}
-    />
-    <div 
-      className="absolute w-56 h-56 rounded-full top-1/3 right-1/4 gpu-layer"
-      style={{
-        background: "linear-gradient(to right, rgba(56, 189, 248, 0.1), rgba(59, 130, 246, 0.1))",
-        filter: "blur(40px)",
-        animation: "pulse-slow 8s ease-in-out infinite 2s",
-      }}
-    />
-  </>
-));
-
-/* -------------------- SECTION BADGE (Simplified) -------------------- */
-const SectionBadge = memo(({ text, icon: Icon }) => (
-  <div
+/* -------------------- SECTION BADGE -------------------- */
+const SectionBadge = ({ text, icon: Icon }) => (
+  <motion.div
     className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
                bg-[#e16928]/10 border border-[#e16928]/30 
                text-[#e16928] dark:text-orange-400"
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ delay: 0.1, duration: 0.4 }}
     style={{ fontFamily: "'Inter', sans-serif" }}
   >
     <span className="relative flex h-2.5 w-2.5">
-      <span 
-        className="absolute inline-flex h-full w-full rounded-full bg-[#e16928] opacity-75"
-        style={{ animation: "ping-slow 1.5s cubic-bezier(0, 0, 0.2, 1) infinite" }}
-      />
-      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#e16928]" />
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e16928] opacity-75"></span>
+      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#e16928]"></span>
     </span>
     {Icon && <Icon className="w-4 h-4" />}
     <span className="text-sm font-medium">{text}</span>
-  </div>
-));
+  </motion.div>
+);
 
-/* -------------------- CATEGORY FILTER BUTTON (CSS-based) -------------------- */
-const CategoryButton = memo(({ category, isActive, onClick }) => {
+/* -------------------- CATEGORY FILTER BUTTON -------------------- */
+const CategoryButton = ({ category, isActive, onClick, index }) => {
   const Icon = category.icon;
   
   return (
-    <button
+    <motion.button
       onClick={onClick}
       className={`
-        category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl
-        font-medium text-sm
+        flex items-center gap-2 px-4 py-2.5 rounded-xl
+        font-medium text-sm transition-all duration-200
         ${isActive 
           ? 'bg-gradient-to-r from-[#e16928] to-yellow-500 text-white shadow-lg shadow-[#e16928]/25' 
           : 'bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#e16928]/40'
         }
       `}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.05 * index, duration: 0.3 }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
       <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#e16928]'}`} />
       <span className="hidden sm:inline">{category.name}</span>
-    </button>
+    </motion.button>
   );
-});
+};
 
-/* -------------------- STATUS BADGE (Simple) -------------------- */
-const StatusBadge = memo(({ status }) => {
+/* -------------------- STATUS BADGE -------------------- */
+const StatusBadge = ({ status }) => {
   const isInProgress = status === "In Progress";
   
   return (
@@ -408,15 +308,14 @@ const StatusBadge = memo(({ status }) => {
         : 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30'
       }
     `}>
-      <span className={`w-1.5 h-1.5 rounded-full ${isInProgress ? 'bg-yellow-500' : 'bg-green-500'}`}
-            style={{ animation: isInProgress ? 'pulse-slow 2s ease-in-out infinite' : 'none' }} />
+      <span className={`w-1.5 h-1.5 rounded-full ${isInProgress ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
       {status}
     </span>
   );
-});
+};
 
-/* -------------------- TECH TAG (Simplified) -------------------- */
-const TechTag = memo(({ tech }) => {
+/* -------------------- TECH TAG -------------------- */
+const TechTag = ({ tech }) => {
   const techInfo = techIcons[tech] || { icon: FaCode, color: "text-gray-400" };
   const Icon = techInfo.icon;
   
@@ -425,20 +324,21 @@ const TechTag = memo(({ tech }) => {
       className="tech-tag inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg
                  bg-white/50 dark:bg-white/5 backdrop-blur-sm
                  border border-white/40 dark:border-white/10
-                 text-xs font-medium text-gray-700 dark:text-gray-300"
+                 text-xs font-medium text-gray-700 dark:text-gray-300
+                 hover:border-[#e16928]/40 hover:bg-[#e16928]/10"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       <Icon className={`w-3.5 h-3.5 ${techInfo.color}`} />
       {tech}
     </span>
   );
-});
+};
 
-/* -------------------- ACTION BUTTON (CSS-based) -------------------- */
-const ActionButton = memo(({ href, icon: Icon, label, variant = "default" }) => {
+/* -------------------- ACTION BUTTON -------------------- */
+const ActionButton = ({ href, icon: Icon, label, variant = "default" }) => {
   const variants = {
     default: "bg-white/60 dark:bg-white/5 border-white/40 dark:border-white/10 hover:border-[#e16928]/50 hover:bg-[#e16928]/10 text-gray-700 dark:text-gray-300",
-    primary: "bg-gradient-to-r from-[#e16928] to-yellow-500 border-transparent text-white shadow-lg shadow-[#e16928]/20",
+    primary: "bg-gradient-to-r from-[#e16928] to-yellow-500 border-transparent text-white shadow-md shadow-[#e16928]/20",
     github: "bg-gray-900 dark:bg-white/10 border-gray-700 dark:border-white/20 text-white hover:bg-gray-800",
   };
 
@@ -458,73 +358,42 @@ const ActionButton = memo(({ href, icon: Icon, label, variant = "default" }) => 
       <span>{label}</span>
     </a>
   );
-});
+};
 
-/* -------------------- STATS CARD (CSS-based) -------------------- */
-const StatsCard = memo(({ icon: Icon, value, label, color }) => (
-  <div
-    className="stats-card flex flex-col items-center p-4 sm:p-6 rounded-2xl
-               bg-white/60 dark:bg-white/5 backdrop-blur-sm
-               border border-white/40 dark:border-white/10 gpu-layer"
-  >
-    <Icon className={`w-8 h-8 mb-2 ${color}`} />
-    <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white
-                    font-['Montserrat',sans-serif]">
-      {value}
-    </span>
-    <span className="text-sm text-gray-500 dark:text-gray-400 font-['Inter',sans-serif]">
-      {label}
-    </span>
-  </div>
-));
-
-/* -------------------- PROJECT CARD (Optimized with CSS) -------------------- */
-const ProjectCard = memo(({ project, index }) => {
+/* -------------------- PROJECT CARD (OPTIMIZED) -------------------- */
+const ProjectCard = ({ project, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const isEven = index % 2 === 0;
 
   return (
-    <article
-      className="project-card group relative w-full gpu-layer
+    <motion.article
+      className="project-card group relative w-full
                  bg-white/70 dark:bg-white/[0.03] backdrop-blur-lg
-                 rounded-3xl overflow-hidden
+                 rounded-2xl overflow-hidden
                  border border-white/40 dark:border-white/10
-                 shadow-lg dark:shadow-xl"
+                 shadow-lg hover:shadow-xl hover:shadow-[#e16928]/10
+                 hover:border-[#e16928]/30"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
     >
-      {/* Gradient border - CSS transition */}
-      <div
-        className="gradient-border gradient-border-animated absolute inset-0 rounded-3xl pointer-events-none"
-        style={{
-          padding: "2px",
-          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          WebkitMaskComposite: "xor",
-          maskComposite: "exclude",
-        }}
-      />
-
-      {/* Background glow - CSS transition */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 
-                      bg-gradient-to-r from-[#e16928]/5 via-transparent to-yellow-400/5 
-                      transition-opacity duration-500 pointer-events-none" />
-
       {/* Featured badge */}
       {project.featured && (
-        <div
-          className="absolute top-4 right-4 z-20 flex items-center gap-1.5 
-                     px-3 py-1.5 rounded-full
-                     bg-gradient-to-r from-[#e16928] to-yellow-500
-                     text-white text-xs font-bold shadow-lg"
-        >
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 
+                       px-3 py-1.5 rounded-full
+                       bg-gradient-to-r from-[#e16928] to-yellow-500
+                       text-white text-xs font-bold shadow-md">
           <Star className="w-3.5 h-3.5 fill-current" />
           Featured
         </div>
       )}
 
       {/* Content Layout */}
-      <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-0`}>
+      <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
         
         {/* Image Section */}
-        <div className="relative lg:w-1/2 h-64 sm:h-72 lg:h-auto lg:min-h-[400px] overflow-hidden">
+        <div className="relative lg:w-1/2 h-56 sm:h-64 lg:h-auto lg:min-h-[380px] overflow-hidden">
           {/* Image skeleton loader */}
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 
@@ -537,7 +406,6 @@ const ProjectCard = memo(({ project, index }) => {
             className="project-image w-full h-full object-cover"
             onLoad={() => setImageLoaded(true)}
             loading="lazy"
-            decoding="async"
           />
           
           {/* Image overlay gradient */}
@@ -545,15 +413,15 @@ const ProjectCard = memo(({ project, index }) => {
                           from-transparent via-transparent to-white/80 dark:to-black/80
                           opacity-0 lg:opacity-100 pointer-events-none`} />
           
-          {/* Hover overlay - CSS only, no AnimatePresence */}
+          {/* Hover overlay with links */}
           <div className="project-overlay absolute inset-0 flex items-center justify-center
-                         bg-black/50 backdrop-blur-sm">
-            <div className="project-overlay-content flex gap-4">
+                         bg-black/50 backdrop-blur-sm opacity-0">
+            <div className="flex gap-4">
               <a
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 rounded-full bg-white/20 backdrop-blur-md
+                className="p-3 rounded-full bg-white/20 backdrop-blur-sm
                          hover:bg-[#e16928] transition-colors duration-200"
               >
                 <FaGithub className="w-6 h-6 text-white" />
@@ -562,7 +430,7 @@ const ProjectCard = memo(({ project, index }) => {
                 href={project.demo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 rounded-full bg-white/20 backdrop-blur-md
+                className="p-3 rounded-full bg-white/20 backdrop-blur-sm
                          hover:bg-[#e16928] transition-colors duration-200"
               >
                 <ExternalLink className="w-6 h-6 text-white" />
@@ -572,23 +440,22 @@ const ProjectCard = memo(({ project, index }) => {
         </div>
 
         {/* Content Section */}
-        <div className="lg:w-1/2 p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
+        <div className="lg:w-1/2 p-6 sm:p-8 flex flex-col justify-center">
           {/* Status Badge */}
           <div className="mb-4">
             <StatusBadge status={project.status} />
           </div>
 
           {/* Title */}
-          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4
-                         font-['Montserrat',sans-serif]">
-            <span className="shimmer-text-projects text-transparent bg-clip-text">
+          <h3 className="text-2xl sm:text-3xl font-bold mb-4 font-['Montserrat',sans-serif]">
+            <span className="projects-shimmer text-transparent bg-clip-text">
               {project.title}
             </span>
           </h3>
 
           {/* Description */}
-          <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg 
-                       leading-relaxed mb-6 font-['Inter',sans-serif]">
+          <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-5 
+                       font-['Inter',sans-serif]">
             {project.description}
           </p>
 
@@ -601,7 +468,7 @@ const ProjectCard = memo(({ project, index }) => {
           </div>
 
           {/* Learnings */}
-          <div className="mb-6 p-4 rounded-2xl bg-[#e16928]/5 dark:bg-[#e16928]/10
+          <div className="mb-5 p-4 rounded-xl bg-[#e16928]/5 dark:bg-[#e16928]/10
                          border border-[#e16928]/20">
             <div className="flex items-center gap-2 mb-2">
               <Lightbulb className="w-4 h-4 text-[#e16928]" />
@@ -617,7 +484,7 @@ const ProjectCard = memo(({ project, index }) => {
           </div>
 
           {/* Technologies */}
-          <div className="mb-8">
+          <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <Layers className="w-4 h-4 text-[#e16928]" />
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300
@@ -656,12 +523,36 @@ const ProjectCard = memo(({ project, index }) => {
         </div>
       </div>
 
-      {/* Bottom progress line - CSS transition */}
-      <span className="progress-line absolute bottom-0 left-0 h-1 w-0 
+      {/* Bottom progress line */}
+      <span className="project-progress-line absolute bottom-0 left-0 h-0.5 w-0
                       bg-gradient-to-r from-[#e16928] via-orange-400 to-yellow-400" />
-    </article>
+    </motion.article>
   );
-});
+};
+
+/* -------------------- STATS CARD -------------------- */
+const StatsCard = ({ icon: Icon, value, label, color, index }) => (
+  <motion.div
+    className="flex flex-col items-center p-4 sm:p-5 rounded-xl
+               bg-white/60 dark:bg-white/5 backdrop-blur-sm
+               border border-white/40 dark:border-white/10
+               hover:border-[#e16928]/30 transition-all duration-200
+               hover:shadow-md"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ delay: index * 0.1, duration: 0.4 }}
+  >
+    <Icon className={`w-7 h-7 mb-2 ${color}`} />
+    <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white
+                    font-['Montserrat',sans-serif]">
+      {value}
+    </span>
+    <span className="text-sm text-gray-500 dark:text-gray-400 font-['Inter',sans-serif]">
+      {label}
+    </span>
+  </motion.div>
+);
 
 /* -------------------- MAIN PROJECTS SECTION -------------------- */
 const Projects = () => {
@@ -675,33 +566,16 @@ const Projects = () => {
     }
   }, [lenisRef]);
 
-  // Memoize filtered projects
-  const filteredProjects = useMemo(() => {
-    return activeCategory === "all" 
-      ? projects 
-      : projects.filter(project => project.category === activeCategory);
-  }, [activeCategory]);
+  const filteredProjects = activeCategory === "all" 
+    ? projects 
+    : projects.filter(project => project.category === activeCategory);
 
-  // Memoize category change handler
-  const handleCategoryChange = useCallback((categoryId) => {
-    setActiveCategory(categoryId);
-  }, []);
-
-  // Stats data
-  const stats = useMemo(() => [
+  const stats = [
     { icon: FolderOpen, value: "5+", label: "Projects", color: "text-[#e16928]" },
     { icon: Code2, value: "10+", label: "Technologies", color: "text-blue-500" },
     { icon: Zap, value: "1000+", label: "Hours Coded", color: "text-yellow-500" },
     { icon: Rocket, value: "100%", label: "Passion", color: "text-green-500" },
-  ], []);
-
-  // Simple fade animation
-  const fadeInUp = useMemo(() => ({
-    initial: { opacity: 0, y: 20 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: "-50px" },
-    transition: { duration: 0.4 }
-  }), []);
+  ];
 
   return (
     <section
@@ -710,7 +584,7 @@ const Projects = () => {
                  px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24
                  bg-gradient-to-br from-white via-gray-50 to-orange-50/30 
                  dark:from-gray-950 dark:via-black dark:to-gray-900
-                 overflow-hidden"
+                 transition-colors duration-500 overflow-hidden"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* Animated Background */}
@@ -718,8 +592,16 @@ const Projects = () => {
         <AnimatedPlanetStarBackground />
       </div>
 
-      {/* Simplified floating elements - CSS only */}
-      {!shouldReduceMotion && <FloatingBackground />}
+      {/* Simplified decorative elements - CSS only */}
+      {!shouldReduceMotion && (
+        <>
+          <div className="absolute w-64 h-64 bg-gradient-to-r from-[#e16928]/15 to-yellow-400/15 
+                         blur-xl rounded-full top-20 -left-32 projects-pulse" />
+          <div className="absolute w-72 h-72 bg-gradient-to-r from-purple-400/10 to-pink-400/10 
+                         blur-xl rounded-full bottom-20 -right-36 projects-pulse" 
+               style={{ animationDelay: '1.5s' }} />
+        </>
+      )}
 
       {/* Main Content Container */}
       <div className="relative z-10 w-full max-w-7xl mx-auto">
@@ -727,7 +609,10 @@ const Projects = () => {
         {/* Section Header */}
         <motion.div
           className="text-center mb-12 sm:mb-16"
-          {...fadeInUp}
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
         >
           {/* Badge */}
           <div className="flex justify-center mb-4">
@@ -735,66 +620,90 @@ const Projects = () => {
           </div>
 
           {/* Title */}
-          <h2
+          <motion.h2
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold 
                        tracking-tight mb-4 font-['Montserrat',sans-serif]"
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <span className="shimmer-text-projects text-transparent bg-clip-text">
+            <span className="projects-shimmer text-transparent bg-clip-text">
               My Projects
             </span>
-          </h2>
+          </motion.h2>
 
           {/* Subtitle */}
-          <p
+          <motion.p
             className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 
                        max-w-3xl mx-auto leading-relaxed font-['Inter',sans-serif]"
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.5 }}
           >
             A collection of projects that showcase my passion for building 
             innovative solutions and learning new technologies.
-          </p>
+          </motion.p>
 
           {/* Decorative underline */}
-          <div className="mt-6 mx-auto w-24 h-1 rounded-full bg-gradient-to-r from-[#e16928] via-orange-400 to-yellow-400" />
+          <motion.div
+            className="mt-6 mx-auto w-24 h-1 rounded-full bg-gradient-to-r from-[#e16928] via-orange-400 to-yellow-400"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          />
         </motion.div>
 
         {/* Stats Section */}
         <motion.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16"
-          {...fadeInUp}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5 mb-12 sm:mb-14"
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2, duration: 0.4 }}
         >
-          {stats.map((stat) => (
-            <StatsCard key={stat.label} {...stat} />
+          {stats.map((stat, index) => (
+            <StatsCard key={stat.label} {...stat} index={index} />
           ))}
         </motion.div>
 
         {/* Category Filter */}
         <motion.div
-          className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-10 sm:mb-14"
-          {...fadeInUp}
+          className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-12"
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.4 }}
         >
-          {projectCategories.map((category) => (
+          {projectCategories.map((category, index) => (
             <CategoryButton
               key={category.id}
               category={category}
               isActive={activeCategory === category.id}
-              onClick={() => handleCategoryChange(category.id)}
+              onClick={() => setActiveCategory(category.id)}
+              index={index}
             />
           ))}
         </motion.div>
 
-        {/* Projects List - Simple fade, no layout animation */}
-        <div className="flex flex-col space-y-8 sm:space-y-12">
-          {filteredProjects.map((project, index) => (
-            <motion.div
-              key={project.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: Math.min(index * 0.1, 0.3) }}
-            >
-              <ProjectCard project={project} index={index} />
-            </motion.div>
-          ))}
+        {/* Projects List */}
+        <div className="flex flex-col space-y-6 sm:space-y-8">
+          <AnimatePresence mode="popLayout">
+            {filteredProjects.map((project, index) => (
+              <motion.div
+                key={project.title}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ProjectCard project={project} index={index} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Empty State */}
@@ -813,15 +722,16 @@ const Projects = () => {
 
         {/* Bottom CTA Section */}
         <motion.div
-          className="mt-16 sm:mt-20 text-center"
-          {...fadeInUp}
+          className="mt-14 sm:mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.5 }}
         >
           {/* More Projects Badge */}
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6
-                       bg-blue-500/10 border border-blue-500/30 
-                       text-blue-600 dark:text-blue-400"
-          >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6
+                         bg-blue-500/10 border border-blue-500/30 
+                         text-blue-600 dark:text-blue-400">
             <Github className="w-4 h-4" />
             <span className="text-sm font-medium font-['Inter',sans-serif]">
               More Projects on GitHub
@@ -834,11 +744,12 @@ const Projects = () => {
               href="https://github.com/Shubham-Goswami-Github"
               target="_blank"
               rel="noopener noreferrer"
-              className="action-btn inline-flex items-center gap-3 px-8 py-4 rounded-2xl
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl
                         bg-gradient-to-r from-[#e16928] to-yellow-500
                         text-white font-bold text-lg
                         shadow-lg shadow-[#e16928]/25
-                        hover:shadow-xl hover:shadow-[#e16928]/35
+                        hover:shadow-xl hover:shadow-[#e16928]/30
+                        transition-all duration-200 hover:scale-105
                         font-['Poppins',sans-serif]"
             >
               <FaGithub className="w-6 h-6" />
@@ -849,10 +760,10 @@ const Projects = () => {
         </motion.div>
 
         {/* Bottom decorative element */}
-        <div className="flex justify-center mt-12 sm:mt-16">
+        <div className="flex justify-center mt-12 sm:mt-14">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-[#e16928]" />
-            <Sparkles className="w-6 h-6 text-[#e16928] animate-pulse" />
+            <Sparkles className="w-5 h-5 text-[#e16928] animate-pulse" />
             <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-yellow-400" />
           </div>
         </div>

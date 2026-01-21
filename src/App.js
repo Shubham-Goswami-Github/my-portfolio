@@ -8,7 +8,7 @@ import Contact from "./components/ContactBubble";
 import Footer from "./components/Footer";
 import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
-import Testimonials from "./components/Testimonials";
+
 import { LenisProvider } from "./LenisProvider";
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
             <About />
             <Skills />
             <Projects />
-            <Testimonials />
+      
             <Contact />
             <Footer />
           </>
