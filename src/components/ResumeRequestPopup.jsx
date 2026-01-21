@@ -6,7 +6,8 @@ import { collection, addDoc } from "firebase/firestore";
 
 const ResumeRequestPopup = ({ onClose }) => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-  const [sending, setSending] = useState(false);
+
+  const [sending, setSending] = useState(false); // ✅ ADD THIS
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e) =>
@@ -15,6 +16,7 @@ const ResumeRequestPopup = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
+
     try {
       await addDoc(collection(db, "resume_requests"), {
         name: formData.name,
@@ -25,23 +27,24 @@ const ResumeRequestPopup = ({ onClose }) => {
       });
 
       await emailjs.send(
-        "service_r7zsx5o",
-        "template_3qknvw3",
+        "service_s8kkwnl", // ✅ NEW SERVICE ID
+        "template_3qknvw3", // ✅ same template (if unchanged)
         {
           name: formData.name,
           email: formData.email,
           message: formData.message || "Requesting resume download",
           site: "my-portfolio",
         },
-        "CXfCaFkoekA1FCLDh"
+        "F2wa8gLjvNeUzf3KK" // ✅ PUT YOUR NEW PUBLIC KEY HERE
       );
 
       setSuccess(true);
-      setSending(false);
       setFormData({ name: "", email: "", message: "" });
+
       setTimeout(() => onClose(), 3800);
     } catch (err) {
       alert("Error submitting request: " + err.message);
+    } finally {
       setSending(false);
     }
   };
@@ -61,15 +64,14 @@ const ResumeRequestPopup = ({ onClose }) => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.35 }}
       >
-        {/* Close Button */}
         <button
           className="absolute top-3 right-4 text-gray-300 hover:text-red-400 text-2xl transition"
           onClick={onClose}
+          disabled={sending}
         >
           ✕
         </button>
 
-        {/* Heading */}
         <motion.h3
           className="text-3xl font-extrabold text-center bg-gradient-to-r 
                      from-[#e16928ff] to-yellow-400 text-transparent bg-clip-text drop-shadow-lg mb-6"
@@ -131,11 +133,11 @@ const ResumeRequestPopup = ({ onClose }) => {
             <motion.button
               type="submit"
               disabled={sending}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: sending ? 1 : 1.05 }}
+              whileTap={{ scale: sending ? 1 : 0.95 }}
               className="py-3 rounded-lg font-semibold text-lg shadow-md
                          bg-gradient-to-r from-[#e16928ff] to-yellow-400
-                         text-gray-900 hover:brightness-110 transition"
+                         text-gray-900 hover:brightness-110 transition disabled:opacity-60"
             >
               {sending ? "Sending..." : "Submit Request"}
             </motion.button>

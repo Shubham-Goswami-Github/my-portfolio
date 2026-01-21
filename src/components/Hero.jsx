@@ -327,7 +327,7 @@ const Hero = () => {
       });
 
       await emailjs.send(
-        "service_r7zsx5o",
+        "service_s8kkwnl",
         "template_3qknvw3",
         {
           name: formData.name,
@@ -335,7 +335,7 @@ const Hero = () => {
           message: formData.message || "Requesting resume download",
           site: "my-portfolio",
         },
-        "CXfCaFkoekA1FCLDh"
+        "F2wa8gLjvNeUzf3KK"
       );
 
       setSuccess(true);
@@ -692,7 +692,14 @@ const Hero = () => {
       {/* Resume Request Popup */}
       <AnimatePresence>
         {showPopup && (
-          <ResumeRequestPopup onClose={() => setShowPopup(false)} />
+          <ResumeRequestPopup 
+            onClose={() => setShowPopup(false)}
+            formData={formData}
+            sending={sending}
+            success={success}
+            onFormChange={handleChange}
+            onSubmit={handleSubmit}
+          />
         )}
       </AnimatePresence>
     </section>
