@@ -165,7 +165,7 @@ const projects = [
     status: "In Progress",
     featured: true,
     image:
-      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/universalecommerce.png",
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/ecomnew.png",
     github: "https://github.com/Shubham-Goswami-Github/universal-ecommerce",
     demo: "#",
     readme:
@@ -183,7 +183,7 @@ const projects = [
     status: "Completed",
     featured: false,
     image:
-      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20145931.png",
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/evotenew.png",
     github: "https://github.com/Shubham-Goswami-Github/evoting-php",
     demo: "#",
     readme:
@@ -201,7 +201,7 @@ const projects = [
     status: "Completed",
     featured: false,
     image:
-      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150733.png",
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/ftnew.png",
     github:
       "https://github.com/Shubham-Goswami-Github/Android-Daily-Expense-Tracker",
     demo: "#",
@@ -238,7 +238,7 @@ const projects = [
     status: "Completed",
     featured: true,
     image:
-      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/portfolioproject.png",
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/portfolionew.png",
     github: "https://github.com/Shubham-Goswami-Github/my-portfolio",
     demo: "#",
     readme:
