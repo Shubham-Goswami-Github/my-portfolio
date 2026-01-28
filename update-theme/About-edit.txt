@@ -1,0 +1,684 @@
+import { motion, useReducedMotion } from "framer-motion";
+import { TypeAnimation } from "react-type-animation";
+import { useContext, useEffect } from "react";
+import { 
+  FaGraduationCap, 
+  FaUniversity, 
+  FaStar, 
+  FaCalendarAlt,
+  FaAward,
+} from "react-icons/fa";
+import { 
+  BookOpen, 
+  Trophy, 
+  GraduationCap,
+  MapPin,
+  Zap,
+  ChevronRight,
+  Code2,
+  Sparkles,
+  User,
+  Briefcase
+} from "lucide-react";
+import { LenisContext } from "../LenisProvider";
+
+/* -------------------- INJECT PREMIUM STYLES -------------------- */
+if (typeof document !== 'undefined') {
+  const existingStyle = document.getElementById('about-premium-styles');
+  if (!existingStyle) {
+    const style = document.createElement("style");
+    style.id = 'about-premium-styles';
+    style.innerHTML = `
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+      
+      :root {
+        --about-gold: #C9A86C;
+        --about-gold-light: #E8D5B5;
+        --about-gold-dark: #A68B4B;
+      }
+      
+      .about-bg-pure-black {
+        background-color: #000000;
+      }
+      
+      .about-text-gold {
+        color: var(--about-gold);
+      }
+      
+      .about-noise-texture {
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.015;
+      }
+      
+      .about-photo-grayscale {
+        filter: grayscale(100%) contrast(1.1) brightness(0.95);
+      }
+      
+      .about-card-glass {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      
+      .about-card-glass:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(201, 168, 108, 0.2);
+      }
+      
+      .about-gold-gradient-text {
+        background: linear-gradient(135deg, #D4AF37 0%, #C9A86C 30%, #E8D5B5 50%, #C9A86C 70%, #B8956A 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .about-glow-line {
+        background: linear-gradient(90deg, transparent, rgba(201, 168, 108, 0.5), transparent);
+      }
+      
+      .about-accent-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--about-gold);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--about-gold);
+      }
+      
+      @keyframes about-pulse-slow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      .about-animate-pulse-slow {
+        animation: about-pulse-slow 3s ease-in-out infinite;
+      }
+      
+      @keyframes about-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      
+      .about-animate-float {
+        animation: about-float 6s ease-in-out infinite;
+      }
+      
+      .about-photo-blend {
+        mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+      }
+      
+      .about-btn-gold {
+        background: linear-gradient(135deg, #C9A86C 0%, #D4AF37 50%, #C9A86C 100%);
+        box-shadow: 0 4px 20px rgba(201, 168, 108, 0.2);
+      }
+      
+      .about-btn-gold:hover {
+        box-shadow: 0 6px 30px rgba(201, 168, 108, 0.3);
+      }
+      
+      .about-border-gold {
+        border: 1px solid rgba(201, 168, 108, 0.3);
+      }
+      
+      .about-border-gold:hover {
+        border-color: rgba(201, 168, 108, 0.5);
+      }
+      
+      .edu-card-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background: linear-gradient(90deg, var(--about-gold), transparent);
+        transition: width 0.5s ease;
+      }
+      
+      .edu-card:hover .edu-card-line {
+        width: 100%;
+      }
+      
+      .about-typing-cursor::after {
+        content: '|';
+        animation: about-blink 0.8s infinite;
+        color: var(--about-gold);
+      }
+      
+      @keyframes about-blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+/* -------------------- EDUCATION DATA -------------------- */
+const education = [
+  {
+    degree: "10th - CBSE",
+    school: "Central Academy, Kanke, Ranchi",
+    marks: "66%",
+    years: "2018",
+    img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/School-Photo.jpg",
+    icon: BookOpen,
+    highlights: [
+      "Built strong foundation in mathematics & science",
+      "Participated in inter-school tech quiz competition",
+      "Developed curiosity towards computers and technology",
+    ],
+  },
+  {
+    degree: "Intermediate of Science",
+    school: "Marwari College, Ranchi (JAC Board)",
+    marks: "54%",
+    years: "2019 – 2020",
+    img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/College-Photo.jpeg",
+    icon: GraduationCap,
+    highlights: [
+      "Focused on Physics, Chemistry & Mathematics",
+      "Started learning HTML, CSS & basic programming",
+      "Explored problem-solving through online coding games",
+    ],
+  },
+  {
+    degree: "Bachelor of Computer Applications (BCA)",
+    school: "DSPMU, Ranchi",
+    marks: "80%",
+    years: "2020 – 2023",
+    img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Dspmu-photo.jpeg",
+    icon: Trophy,
+    highlights: [
+      "Specialized in Full Stack Web Development",
+      "Built multiple academic & personal projects",
+      "Won departmental web design competition 🏆",
+    ],
+  },
+  {
+    degree: "Master of Computer Applications (MCA)",
+    school: "SBU, Ranchi",
+    marks: "88%",
+    years: "2023 – 2025",
+    img: "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/SBU-Photo.jpeg",
+    icon: Zap,
+    highlights: [
+      "Advanced expertise in React, Node.js & Cloud",
+      "Worked on real-time collaborative applications",
+      "Served as project lead for final year capstone",
+    ],
+  },
+];
+
+/* -------------------- STATS DATA -------------------- */
+const stats = [
+  { label: "Years Learning", value: "7+", icon: BookOpen },
+  { label: "Projects Built", value: "25+", icon: Briefcase },
+  { label: "Technologies", value: "15+", icon: Code2 },
+];
+
+/* -------------------- SECTION BADGE -------------------- */
+const SectionBadge = ({ text, icon: Icon }) => (
+  <motion.div
+    className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
+               bg-[#C9A86C]/10 about-border-gold"
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ delay: 0.1, duration: 0.4 }}
+    style={{ fontFamily: "'Inter', sans-serif" }}
+  >
+    <span className="about-accent-dot about-animate-pulse-slow" />
+    {Icon && <Icon className="w-4 h-4 about-text-gold" />}
+    <span className="text-xs sm:text-sm font-medium about-text-gold tracking-wider uppercase">
+      {text}
+    </span>
+  </motion.div>
+);
+
+/* -------------------- EDUCATION CARD -------------------- */
+const EducationCard = ({ edu, idx }) => {
+  const shouldReduceMotion = useReducedMotion();
+  const Icon = edu.icon;
+
+  return (
+    <motion.article
+      className="edu-card group relative flex flex-col h-full
+                 about-card-glass rounded-2xl overflow-hidden
+                 transition-all duration-500"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ delay: idx * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={!shouldReduceMotion ? { y: -5 } : undefined}
+    >
+      {/* Image Section */}
+      <div className="relative w-full h-40 sm:h-44 overflow-hidden">
+        {/* Image with grayscale */}
+        <img
+          src={edu.img}
+          alt={edu.degree}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover object-center
+                     about-photo-grayscale
+                     group-hover:scale-105 transition-transform duration-700"
+        />
+        
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+
+        {/* Icon badge */}
+        <div className="absolute top-4 right-4 z-20 p-2.5 rounded-xl 
+                       bg-black/60 about-border-gold backdrop-blur-sm
+                       group-hover:bg-[#C9A86C]/20 transition-all duration-300">
+          <Icon className="w-5 h-5 about-text-gold" />
+        </div>
+
+        {/* Year badge */}
+        <div className="absolute bottom-4 left-4 z-20">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full 
+                         bg-black/60 backdrop-blur-sm about-border-gold">
+            <FaCalendarAlt className="w-3 h-3 about-text-gold" />
+            <span className="text-xs font-medium text-neutral-300" 
+                  style={{ fontFamily: "'Inter', sans-serif" }}>
+              {edu.years}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="relative p-5 sm:p-6 flex-1 flex flex-col">
+        
+        {/* Degree Title */}
+        <h3 className="flex items-start gap-3 mb-3">
+          <FaGraduationCap className="about-text-gold flex-shrink-0 mt-1 text-lg" />
+          <span className="text-base sm:text-lg font-semibold text-white leading-tight
+                          group-hover:about-gold-gradient-text transition-all duration-300"
+                style={{ fontFamily: "'Outfit', sans-serif" }}>
+            {edu.degree}
+          </span>
+        </h3>
+
+        {/* School */}
+        <p className="flex items-start gap-2 text-sm text-neutral-400 mb-4" 
+           style={{ fontFamily: "'Inter', sans-serif" }}>
+          <FaUniversity className="about-text-gold flex-shrink-0 mt-0.5 text-sm opacity-70" />
+          <span className="leading-relaxed">{edu.school}</span>
+        </p>
+
+        {/* Marks Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 
+                       bg-[#C9A86C]/10 about-border-gold rounded-full w-fit
+                       group-hover:bg-[#C9A86C]/20 transition-all duration-300">
+          <FaStar className="about-text-gold text-xs" />
+          <span className="font-semibold text-sm text-white"
+                style={{ fontFamily: "'Inter', sans-serif" }}>
+            Score: {edu.marks}
+          </span>
+          <FaAward className="about-text-gold text-xs" />
+        </div>
+
+        {/* Highlights */}
+        <ul className="space-y-2.5 flex-1">
+          {edu.highlights.map((highlight, j) => (
+            <li
+              key={j}
+              className="flex items-start gap-2.5 text-sm text-neutral-400 
+                         leading-relaxed group-hover:text-neutral-300 transition-colors duration-300"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full 
+                              bg-[#C9A86C]/20 flex-shrink-0 mt-0.5">
+                <ChevronRight className="w-2.5 h-2.5 about-text-gold" />
+              </span>
+              <span>{highlight}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Bottom line animation */}
+        <span className="edu-card-line" />
+      </div>
+    </motion.article>
+  );
+};
+
+/* -------------------- PROFILE SECTION -------------------- */
+const ProfileSection = () => {
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      className="relative flex-shrink-0"
+      initial={{ opacity: 0, scale: 0.9, x: 30 }}
+      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {/* Outer glow */}
+      <div className="absolute -inset-6 sm:-inset-8 rounded-full 
+                     bg-[#C9A86C]/10 blur-2xl opacity-50" />
+
+      {/* Main container */}
+      <div className={`relative ${shouldReduceMotion ? '' : 'about-animate-float'}`}>
+        
+        {/* Border ring */}
+        <div className="absolute -inset-1 sm:-inset-1.5 rounded-full 
+                       bg-gradient-to-br from-[#C9A86C]/50 via-[#C9A86C]/20 to-[#C9A86C]/50" />
+
+        {/* Image container */}
+        <div className="relative w-52 h-52 sm:w-60 sm:h-60 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden">
+          
+          {/* Inner border */}
+          <div className="absolute inset-1 rounded-full bg-black" />
+          
+          {/* Image */}
+          <div className="absolute inset-2 rounded-full overflow-hidden">
+            <img
+              src="https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/about.jpeg"
+              alt="Shubham Das Goswami"
+              className="w-full h-full object-cover about-photo-grayscale"
+              loading="eager"
+            />
+            
+            {/* Overlay for blend */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20" />
+          </div>
+        </div>
+
+        {/* Floating badge - Code */}
+        <motion.div 
+          className="absolute -bottom-2 -left-2 sm:-bottom-3 sm:-left-3 
+                    w-12 h-12 sm:w-14 sm:h-14 rounded-xl 
+                    bg-black about-border-gold backdrop-blur-sm
+                    flex items-center justify-center shadow-xl"
+          initial={{ scale: 0, rotate: -20 }}
+          whileInView={{ scale: 1, rotate: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+        >
+          <Code2 className="w-5 h-5 sm:w-6 sm:h-6 about-text-gold" />
+        </motion.div>
+
+        {/* Floating badge - Sparkles */}
+        <motion.div 
+          className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 
+                    w-10 h-10 sm:w-12 sm:h-12 rounded-xl 
+                    about-btn-gold
+                    flex items-center justify-center shadow-xl"
+          initial={{ scale: 0, rotate: 20 }}
+          whileInView={{ scale: 1, rotate: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+        >
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
+/* -------------------- STAT CARD -------------------- */
+const StatCard = ({ stat, index }) => {
+  const Icon = stat.icon;
+  
+  return (
+    <motion.div
+      className="flex flex-col items-center gap-2 p-4 sm:p-6 rounded-xl about-card-glass
+                 hover:bg-[#C9A86C]/5 transition-all duration-300"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+    >
+      <Icon className="w-5 h-5 about-text-gold mb-1" />
+      <span className="text-2xl sm:text-3xl font-bold text-white"
+            style={{ fontFamily: "'Outfit', sans-serif" }}>
+        {stat.value}
+      </span>
+      <span className="text-xs sm:text-sm text-neutral-500 text-center"
+            style={{ fontFamily: "'Inter', sans-serif" }}>
+        {stat.label}
+      </span>
+    </motion.div>
+  );
+};
+
+/* -------------------- MAIN ABOUT SECTION -------------------- */
+const About = () => {
+  const lenisRef = useContext(LenisContext);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (lenisRef?.current) {
+      lenisRef.current.scrollTo(window.scrollY, { immediate: true });
+    }
+  }, [lenisRef]);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+  };
+
+  return (
+    <section
+      id="about"
+      className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-32
+                 about-bg-pure-black overflow-hidden"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Noise texture overlay */}
+      <div className="absolute inset-0 about-noise-texture pointer-events-none z-[1]" />
+      
+      {/* Subtle ambient glows */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#C9A86C]/[0.02] rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-neutral-800/[0.04] rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Main Content Container */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
+
+        {/* ========== SECTION HEADER ========== */}
+        <motion.div
+          className="text-center mb-16 sm:mb-20"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {/* Badge */}
+          <motion.div variants={itemVariants} className="flex justify-center mb-6">
+            <SectionBadge text="Get to know me" icon={User} />
+          </motion.div>
+
+          {/* Title */}
+          <motion.h2
+            variants={itemVariants}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold 
+                       tracking-tight mb-6"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            <span className="about-gold-gradient-text">About Me</span>
+          </motion.h2>
+
+          {/* Subtitle */}
+          <motion.p
+            variants={itemVariants}
+            className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed"
+          >
+            Crafting digital experiences with a blend of engineering, design, and continuous learning.
+          </motion.p>
+
+          {/* Decorative line */}
+          <motion.div
+            variants={itemVariants}
+            className="mt-8 mx-auto w-20 h-px about-glow-line"
+          />
+        </motion.div>
+
+        {/* ========== INTRO SECTION ========== */}
+        <motion.div
+          className="relative mb-20 sm:mb-24"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="relative rounded-2xl overflow-hidden about-card-glass
+                         px-6 sm:px-10 md:px-14 lg:px-20 py-12 sm:py-16 lg:py-20">
+            
+            {/* Top accent line */}
+            <div className="absolute inset-x-0 top-0 h-px about-glow-line" />
+
+            {/* Grid Layout */}
+            <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-12 lg:gap-20">
+              
+              {/* Left - Text Content */}
+              <motion.div
+                className="flex-1 text-center lg:text-left space-y-6 max-w-2xl"
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                {/* Typing Animation */}
+                <div className="min-h-[3rem] sm:min-h-[3.5rem]">
+                  <TypeAnimation
+                    sequence={[
+                      "Hey there! I'm Shubham 👋",
+                      2500,
+                      "A Passionate Web Developer 💻",
+                      2500,
+                      "UI/UX Enthusiast 🎨",
+                      2500,
+                      "Problem Solver & Tech Explorer 🚀",
+                      2500,
+                    ]}
+                    speed={50}
+                    repeat={Infinity}
+                    className="text-xl sm:text-2xl md:text-3xl font-semibold text-white"
+                    style={{ fontFamily: "'Outfit', sans-serif" }}
+                  />
+                </div>
+
+                {/* Description paragraphs */}
+                <p className="text-base sm:text-lg text-neutral-400 leading-relaxed">
+                  I build <span className="text-white font-medium">clean</span>, <span className="about-text-gold font-medium">modern</span>, and <span className="text-white font-medium">responsive</span> web applications focused on performance and exceptional user experience.
+                </p>
+                
+                <p className="text-base sm:text-lg text-neutral-400 leading-relaxed">
+                  I love exploring frontend ecosystems, experimenting with design systems, and bringing UI ideas to life with smooth interactions and meaningful animations.
+                </p>
+                
+                <p className="text-base sm:text-lg text-neutral-400 leading-relaxed">
+                  When I'm not coding, I enjoy collaborating on interesting projects, contributing to open source, and continuously learning new technologies.
+                </p>
+
+                {/* Location */}
+                <div className="flex items-center justify-center lg:justify-start gap-2 pt-2">
+                  <MapPin className="w-4 h-4 about-text-gold" />
+                  <span className="text-sm text-neutral-500">Based in Ranchi, India</span>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6">
+                  {stats.map((stat, index) => (
+                    <StatCard key={stat.label} stat={stat} index={index} />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Right - Profile Image */}
+              <ProfileSection />
+            </div>
+
+            {/* Bottom accent line */}
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
+          </div>
+        </motion.div>
+
+        {/* ========== EDUCATION SECTION ========== */}
+        <motion.div
+          className="text-center mb-12 sm:mb-16"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <motion.div variants={itemVariants} className="flex justify-center mb-6">
+            <SectionBadge text="Learning Journey" icon={GraduationCap} />
+          </motion.div>
+
+          <motion.h3
+            variants={itemVariants}
+            className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            <span className="about-gold-gradient-text">Education</span>
+          </motion.h3>
+
+          <motion.p
+            variants={itemVariants}
+            className="text-base sm:text-lg text-neutral-400 max-w-xl mx-auto"
+          >
+            A path shaped by consistent learning, hands-on projects, and real-world problem solving.
+          </motion.p>
+
+          <motion.div
+            variants={itemVariants}
+            className="mt-8 mx-auto w-16 h-px about-glow-line"
+          />
+        </motion.div>
+
+        {/* Education Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          {education.map((edu, idx) => (
+            <EducationCard key={edu.degree} edu={edu} idx={idx} />
+          ))}
+        </div>
+
+        {/* ========== BOTTOM DECORATIVE ========== */}
+        <motion.div 
+          className="flex justify-center mt-20 sm:mt-24"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-px bg-gradient-to-r from-transparent to-neutral-800" />
+            <div className="about-accent-dot" />
+            <div className="w-16 h-px bg-gradient-to-l from-transparent to-neutral-800" />
+          </div>
+        </motion.div>
+
+        {/* Corner accents */}
+        <div className="hidden lg:block absolute top-8 left-8 w-12 h-12">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-neutral-800/50 to-transparent" />
+          <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-neutral-800/50 to-transparent" />
+        </div>
+        
+        <div className="hidden lg:block absolute bottom-8 right-8 w-12 h-12">
+          <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-l from-neutral-800/50 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-full w-px bg-gradient-to-t from-neutral-800/50 to-transparent" />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default About;
