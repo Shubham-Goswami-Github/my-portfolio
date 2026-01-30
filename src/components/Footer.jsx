@@ -1,35 +1,163 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { memo, useEffect, useState, useContext, useMemo, lazy, Suspense } from "react";
+import { memo, useEffect, useState, useContext, useMemo } from "react";
 import { LenisContext } from "../LenisProvider";
-import { Sparkles, Mail, MapPin, Phone } from "lucide-react";
+import { 
+  Sparkles, 
+  Mail, 
+  MapPin, 
+  Phone,
+  ArrowUpRight,
+  Heart,
+  Code2,
+  ChevronRight,
+  ExternalLink
+} from "lucide-react";
 import { 
   FaGithub, 
   FaLinkedin, 
   FaTwitter, 
-  FaInstagram, 
+  FaInstagram,
   FaRobot,
-  FaCode,
-  FaHeart
 } from "react-icons/fa";
 
-// Lazy load heavy background component
-const AnimatedPlanetStarBackground = lazy(() => import("./AnimatedPlanetStarBackground"));
+/* -------------------- INJECT PREMIUM STYLES -------------------- */
+if (typeof document !== 'undefined') {
+  const existingStyle = document.getElementById('footer-premium-styles');
+  if (!existingStyle) {
+    const style = document.createElement("style");
+    style.id = 'footer-premium-styles';
+    style.innerHTML = `
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+      
+      :root {
+        --footer-gold: #C9A86C;
+        --footer-gold-light: #E8D5B5;
+        --footer-gold-dark: #A68B4B;
+      }
+      
+      .footer-bg-pure-black {
+        background-color: #000000;
+      }
+      
+      .footer-text-gold {
+        color: var(--footer-gold);
+      }
+      
+      .footer-noise-texture {
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.015;
+      }
+      
+      .footer-gold-gradient-text {
+        background: linear-gradient(135deg, #D4AF37 0%, #C9A86C 30%, #E8D5B5 50%, #C9A86C 70%, #B8956A 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .footer-glow-line {
+        background: linear-gradient(90deg, transparent, rgba(201, 168, 108, 0.5), transparent);
+      }
+      
+      .footer-accent-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--footer-gold);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--footer-gold);
+      }
+      
+      @keyframes footer-pulse-slow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      .footer-animate-pulse-slow {
+        animation: footer-pulse-slow 3s ease-in-out infinite;
+      }
+      
+      .footer-btn-gold {
+        background: linear-gradient(135deg, #C9A86C 0%, #D4AF37 50%, #C9A86C 100%);
+        box-shadow: 0 4px 20px rgba(201, 168, 108, 0.2);
+      }
+      
+      .footer-btn-gold:hover {
+        box-shadow: 0 6px 30px rgba(201, 168, 108, 0.3);
+      }
+      
+      .footer-border-gold {
+        border: 1px solid rgba(201, 168, 108, 0.3);
+      }
+      
+      .footer-card-glass {
+        background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: all 0.3s ease;
+      }
+      
+      .footer-card-glass:hover {
+        background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+        border-color: rgba(201, 168, 108, 0.2);
+      }
+      
+      .footer-link-hover {
+        transition: all 0.3s ease;
+      }
+      
+      .footer-link-hover:hover {
+        color: var(--footer-gold);
+        transform: translateX(4px);
+      }
+      
+      .footer-social-btn {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+      }
+      
+      .footer-social-btn:hover {
+        border-color: rgba(201, 168, 108, 0.5);
+        transform: translateY(-3px);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
 
-/* -------------------- STATIC DATA (moved outside component) -------------------- */
+/* -------------------- STATIC DATA -------------------- */
 const quickLinks = [
-  { label: "Home", href: "#home" },
+  { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
-  { label: "Testimonials", href: "#testimonials" },
   { label: "Contact", href: "#contact" },
 ];
 
 const socialLinks = [
-  { icon: FaGithub, link: "https://github.com/Shubham-Goswami-Github", label: "GitHub", hoverClass: "hover:bg-gray-800" },
-  { icon: FaLinkedin, link: "https://www.linkedin.com/in/shubham-das-goswami-b66997254/", label: "LinkedIn", hoverClass: "hover:bg-blue-600" },
-  { icon: FaTwitter, link: "https://x.com/Shubham_S8990", label: "Twitter", hoverClass: "hover:bg-sky-500" },
-  { icon: FaInstagram, link: "https://www.instagram.com/sacrastic_shubham/", label: "Instagram", hoverClass: "hover:bg-pink-500" },
+  { 
+    icon: FaGithub, 
+    link: "https://github.com/Shubham-Goswami-Github", 
+    label: "GitHub",
+    color: "#ffffff"
+  },
+  { 
+    icon: FaLinkedin, 
+    link: "https://www.linkedin.com/in/shubham-das-goswami-b66997254/", 
+    label: "LinkedIn",
+    color: "#0A66C2"
+  },
+  { 
+    icon: FaTwitter, 
+    link: "https://x.com/Shubham_S8990", 
+    label: "Twitter",
+    color: "#1DA1F2"
+  },
+  { 
+    icon: FaInstagram, 
+    link: "https://www.instagram.com/sacrastic_shubham/", 
+    label: "Instagram",
+    color: "#E4405F"
+  },
 ];
 
 const contactInfo = [
@@ -38,106 +166,121 @@ const contactInfo = [
   { icon: Phone, text: "+91 775999****", href: "tel:+91775999****" },
 ];
 
-/* -------------------- SIMPLE CSS (inline styles instead of dynamic injection) -------------------- */
-const shimmerStyle = {
-  backgroundImage: 'linear-gradient(90deg, #e16928, #fbbf24, #f59e0b, #e16928)',
-  backgroundSize: '300% 100%',
-  WebkitBackgroundClip: 'text',
-  backgroundClip: 'text',
-  color: 'transparent',
-};
-
-/* -------------------- OPTIMIZED SIMPLE ANIMATION VARIANTS -------------------- */
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
-};
-
-const staggerContainer = {
-  visible: { transition: { staggerChildren: 0.05 } }
-};
+const techStack = ["React", "Tailwind CSS", "Node.js", "Firebase"];
 
 /* -------------------- MEMOIZED COMPONENTS -------------------- */
 const SocialLink = memo(({ social }) => {
   const Icon = social.icon;
   return (
-    <a
+    <motion.a
       href={social.link}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={social.label}
-      className={`p-3 rounded-xl bg-white/50 dark:bg-white/5 border border-white/30 
-                 dark:border-white/10 text-gray-700 dark:text-gray-300 
-                 transition-all duration-200 hover:text-white hover:scale-105 
-                 hover:shadow-lg ${social.hoverClass}`}
+      className="footer-social-btn p-3 rounded-xl text-neutral-400
+                 hover:text-white"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      style={{ '--hover-color': social.color }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = social.color + '80';
+        e.currentTarget.style.boxShadow = `0 0 20px ${social.color}30`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+        e.currentTarget.style.boxShadow = 'none';
+      }}
     >
       <Icon className="w-5 h-5" />
-    </a>
+    </motion.a>
   );
 });
 
-const QuickLink = memo(({ link }) => (
-  <li>
+const QuickLink = memo(({ link, index }) => (
+  <motion.li
+    initial={{ opacity: 0, x: -10 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    transition={{ delay: 0.1 + index * 0.05, duration: 0.4 }}
+  >
     <a
       href={link.href}
-      className="group inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 
-                 hover:text-[#e16928] transition-colors duration-200"
+      className="footer-link-hover group inline-flex items-center gap-2 text-neutral-400 text-sm"
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#e16928]/50 
-                      group-hover:bg-[#e16928] transition-colors duration-200" />
-      <span className="hover:translate-x-1 transition-transform duration-200">
-        {link.label}
-      </span>
+      <ChevronRight className="w-3 h-3 footer-text-gold opacity-0 group-hover:opacity-100 transition-opacity" />
+      <span>{link.label}</span>
     </a>
-  </li>
+  </motion.li>
 ));
 
-const ContactItem = memo(({ item }) => {
+const ContactItem = memo(({ item, index }) => {
   const Icon = item.icon;
   return (
-    <a
+    <motion.a
       href={item.href}
-      className="group flex items-center gap-3 text-gray-600 dark:text-gray-400
-                 hover:text-[#e16928] transition-colors duration-200"
+      className="group flex items-center gap-3 text-neutral-400 hover:text-white transition-colors duration-300"
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.1 + index * 0.1, duration: 0.4 }}
     >
-      <div className="p-2 rounded-lg bg-[#e16928]/10 group-hover:bg-[#e16928]/20 
-                     transition-colors duration-200">
-        <Icon className="w-4 h-4 text-[#e16928]" />
+      <div className="p-2.5 rounded-lg bg-[#C9A86C]/10 footer-border-gold
+                     group-hover:bg-[#C9A86C]/20 transition-colors duration-300">
+        <Icon className="w-4 h-4 footer-text-gold" />
       </div>
       <span className="text-sm">{item.text}</span>
-    </a>
+    </motion.a>
   );
 });
 
 const VisitorCounter = memo(({ count }) => (
-  <div className="relative p-4 rounded-2xl bg-white/60 dark:bg-white/5 
-                 border border-white/30 dark:border-white/10 shadow-sm">
+  <motion.div 
+    className="footer-card-glass p-5 rounded-2xl"
+    initial={{ opacity: 0, scale: 0.95 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5 }}
+  >
     <div className="flex items-center gap-4">
-      <div className="p-3 rounded-xl bg-gradient-to-br from-[#e16928]/20 to-yellow-400/20">
-        <FaRobot className="w-8 h-8 text-[#e16928] dark:text-orange-400" />
+      <div className="p-3 rounded-xl footer-btn-gold">
+        <FaRobot className="w-7 h-7 text-black" />
       </div>
       <div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">
+        <p className="text-[10px] text-neutral-500 font-medium uppercase tracking-wider mb-1">
           Total Visitors
         </p>
-        <p className="text-2xl sm:text-3xl font-bold" style={shimmerStyle}>
+        <p className="text-2xl sm:text-3xl font-bold footer-gold-gradient-text"
+           style={{ fontFamily: "'Outfit', sans-serif" }}>
           {count.toLocaleString()}
         </p>
       </div>
     </div>
-  </div>
+  </motion.div>
 ));
 
-const TechBadges = memo(() => (
-  <div className="flex flex-wrap gap-2 pt-2">
-    {['React', 'Tailwind', 'Node.js'].map((tech) => (
-      <span key={tech} 
-            className="px-2.5 py-1 text-xs rounded-lg bg-[#e16928]/10 
-                      text-[#e16928] dark:text-orange-400 border border-[#e16928]/20 font-medium">
-        {tech}
-      </span>
-    ))}
-  </div>
+const TechBadge = memo(({ tech, index }) => (
+  <motion.span 
+    className="px-3 py-1.5 text-[10px] sm:text-xs font-medium tracking-wider uppercase
+               text-neutral-400 border border-neutral-800/80 rounded-full
+               bg-neutral-900/30 hover:border-[#C9A86C]/40 hover:text-[#C9A86C]
+               transition-all duration-300"
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}
+    style={{ fontFamily: "'Inter', sans-serif" }}
+  >
+    {tech}
+  </motion.span>
+));
+
+/* -------------------- SECTION TITLE -------------------- */
+const SectionTitle = memo(({ title }) => (
+  <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-3 mb-5"
+      style={{ fontFamily: "'Outfit', sans-serif" }}>
+    <span className="w-8 h-0.5 rounded-full bg-gradient-to-r from-[#C9A86C] to-transparent" />
+    {title}
+  </h3>
 ));
 
 /* -------------------- MAIN FOOTER COMPONENT -------------------- */
@@ -145,7 +288,6 @@ const Footer = () => {
   const lenisRef = useContext(LenisContext);
   const shouldReduceMotion = useReducedMotion();
   const [visitors, setVisitors] = useState(0);
-  const [showBackground, setShowBackground] = useState(false);
 
   useEffect(() => {
     if (lenisRef?.current) {
@@ -161,116 +303,130 @@ const Footer = () => {
     setVisitors(count);
   }, []);
 
-  // Delay loading heavy background
-  useEffect(() => {
-    const timer = setTimeout(() => setShowBackground(true), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const currentYear = useMemo(() => new Date().getFullYear(), []);
-  
-  // Simplified motion props
-  const motionProps = shouldReduceMotion 
-    ? {} 
-    : {
-        initial: "hidden",
-        whileInView: "visible",
-        viewport: { once: true, margin: "-50px" },
-        variants: fadeInUp,
-        transition: { duration: 0.4 }
-      };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+  };
 
   return (
     <footer
-      className="relative pt-16 sm:pt-20 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden
-                 bg-gradient-to-br from-white via-gray-50 to-orange-50/30 
-                 dark:from-gray-950 dark:via-black dark:to-gray-900"
+      className="relative pt-20 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden footer-bg-pure-black"
+      style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Lazy loaded background - only render if not reducing motion */}
-      {showBackground && !shouldReduceMotion && (
-        <Suspense fallback={null}>
-          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-50">
-            <AnimatedPlanetStarBackground />
-          </div>
-        </Suspense>
-      )}
+      {/* Noise texture overlay */}
+      <div className="absolute inset-0 footer-noise-texture pointer-events-none z-[1]" />
+      
+      {/* Subtle ambient glows */}
+      <div className="absolute top-20 left-1/4 w-[400px] h-[400px] bg-[#C9A86C]/[0.02] rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-20 right-1/4 w-[300px] h-[300px] bg-neutral-800/[0.04] rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Simple gradient overlays instead of animated floating elements */}
-      <div className="absolute top-0 left-0 w-64 h-64 bg-[#e16928]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-purple-400/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Top Border */}
-      <div className="absolute top-0 left-0 right-0 h-1 
-                     bg-gradient-to-r from-transparent via-[#e16928] to-transparent opacity-50" />
+      {/* Top Border Line */}
+      <div className="absolute top-0 left-0 right-0 h-px footer-glow-line" />
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto">
 
-        {/* Header Section */}
-        <motion.div className="text-center mb-12 sm:mb-16" {...motionProps}>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">
-            <span style={shimmerStyle}>Shubham Goswami</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-md mx-auto">
-            Web Developer & Designer crafting beautiful digital experiences
-          </p>
-          <div className="mt-4 mx-auto w-20 h-1 rounded-full 
-                        bg-gradient-to-r from-[#e16928] via-orange-400 to-yellow-400" />
+        {/* ========== HEADER SECTION ========== */}
+        <motion.div 
+          className="text-center mb-16 sm:mb-20"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <motion.div variants={itemVariants} className="flex justify-center mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
+                           bg-[#C9A86C]/10 footer-border-gold">
+              <span className="footer-accent-dot footer-animate-pulse-slow" />
+              <Sparkles className="w-4 h-4 footer-text-gold" />
+              <span className="text-xs sm:text-sm font-medium footer-text-gold tracking-wider uppercase">
+                Let's Connect
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.h2 
+            variants={itemVariants}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            <span className="footer-gold-gradient-text">Shubham Goswami</span>
+          </motion.h2>
+
+          <motion.p 
+            variants={itemVariants}
+            className="text-neutral-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed"
+          >
+            Web Developer & UI Engineer crafting beautiful digital experiences
+          </motion.p>
+
+          <motion.div 
+            variants={itemVariants}
+            className="mt-6 mx-auto w-20 h-px footer-glow-line"
+          />
         </motion.div>
 
-        {/* Footer Grid */}
+        {/* ========== FOOTER GRID ========== */}
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-12"
-          {...motionProps}
-          variants={staggerContainer}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-12 mb-16"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
         >
           {/* About Section */}
-          <motion.div className="lg:col-span-1 space-y-4" variants={fadeInUp}>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="w-8 h-1 rounded-full bg-gradient-to-r from-[#e16928] to-yellow-400" />
-              About Me
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              A passionate <span className="text-[#e16928] dark:text-orange-400 font-medium">
-              Full Stack Developer</span> creating immersive, animated, and responsive 
-              digital experiences using modern technologies.
+          <motion.div variants={itemVariants} className="lg:col-span-1 space-y-5">
+            <SectionTitle title="About Me" />
+            <p className="text-neutral-400 text-sm leading-relaxed">
+              A passionate <span className="footer-text-gold font-medium">Full Stack Developer</span> creating 
+              immersive, animated, and responsive digital experiences using modern technologies.
             </p>
-            <TechBadges />
+            <div className="flex flex-wrap gap-2 pt-2">
+              {techStack.map((tech, index) => (
+                <TechBadge key={tech} tech={tech} index={index} />
+              ))}
+            </div>
           </motion.div>
 
           {/* Quick Links */}
-          <motion.div className="space-y-4" variants={fadeInUp}>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="w-8 h-1 rounded-full bg-gradient-to-r from-[#e16928] to-yellow-400" />
-              Quick Links
-            </h3>
-            <ul className="space-y-2.5">
-              {quickLinks.map((link) => (
-                <QuickLink key={link.label} link={link} />
+          <motion.div variants={itemVariants} className="space-y-5">
+            <SectionTitle title="Quick Links" />
+            <ul className="space-y-3">
+              {quickLinks.map((link, index) => (
+                <QuickLink key={link.label} link={link} index={index} />
               ))}
             </ul>
           </motion.div>
 
           {/* Contact Info */}
-          <motion.div className="space-y-4" variants={fadeInUp}>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="w-8 h-1 rounded-full bg-gradient-to-r from-[#e16928] to-yellow-400" />
-              Contact
-            </h3>
-            <div className="space-y-3">
-              {contactInfo.map((item) => (
-                <ContactItem key={item.text} item={item} />
+          <motion.div variants={itemVariants} className="space-y-5">
+            <SectionTitle title="Contact" />
+            <div className="space-y-4">
+              {contactInfo.map((item, index) => (
+                <ContactItem key={item.text} item={item} index={index} />
               ))}
             </div>
           </motion.div>
 
           {/* Social & Visitors */}
-          <motion.div className="space-y-6" variants={fadeInUp}>
+          <motion.div variants={itemVariants} className="space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                <span className="w-8 h-1 rounded-full bg-gradient-to-r from-[#e16928] to-yellow-400" />
-                Follow Me
-              </h3>
+              <SectionTitle title="Follow Me" />
               <div className="flex gap-3">
                 {socialLinks.map((social) => (
                   <SocialLink key={social.label} social={social} />
@@ -281,35 +437,73 @@ const Footer = () => {
           </motion.div>
         </motion.div>
 
-        {/* Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-700 to-transparent mb-8" />
+        {/* ========== DIVIDER ========== */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-800 to-transparent mb-8" />
 
-        {/* Bottom Section */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-1.5 flex-wrap justify-center">
+        {/* ========== BOTTOM SECTION ========== */}
+        <motion.div 
+          className="flex flex-col sm:flex-row items-center justify-between gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-neutral-500 text-xs sm:text-sm flex items-center gap-1.5 flex-wrap justify-center">
             <span>&copy; {currentYear}</span>
-            <span style={shimmerStyle} className="font-semibold">Shubham Goswami</span>
+            <span className="footer-gold-gradient-text font-semibold">Shubham Goswami</span>
             <span>• All rights reserved</span>
           </p>
 
-          <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-1.5">
+          <p className="text-neutral-500 text-xs sm:text-sm flex items-center gap-2">
             <span>Made with</span>
-            <FaHeart className="w-4 h-4 text-red-500" />
+            <Heart className="w-4 h-4 text-red-500 fill-red-500" />
             <span>&</span>
-            <FaCode className="w-4 h-4 text-[#e16928]" />
+            <Code2 className="w-4 h-4 footer-text-gold" />
             <span>in India</span>
           </p>
-        </div>
+        </motion.div>
 
-        {/* Bottom Decoration */}
-        <div className="flex justify-center mt-8">
+        {/* ========== BOTTOM DECORATION ========== */}
+        <motion.div 
+          className="flex justify-center mt-10"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+        >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-[#e16928]" />
-            <Sparkles className="w-5 h-5 text-[#e16928]" />
-            <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-yellow-400" />
+            <div className="w-16 h-px bg-gradient-to-r from-transparent to-neutral-800" />
+            <div className="footer-accent-dot" />
+            <div className="w-16 h-px bg-gradient-to-l from-transparent to-neutral-800" />
           </div>
+        </motion.div>
+
+        {/* Corner accents */}
+        <div className="hidden lg:block absolute top-8 left-8 w-12 h-12">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-neutral-800/50 to-transparent" />
+          <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-neutral-800/50 to-transparent" />
+        </div>
+        
+        <div className="hidden lg:block absolute bottom-8 right-8 w-12 h-12">
+          <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-l from-neutral-800/50 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-full w-px bg-gradient-to-t from-neutral-800/50 to-transparent" />
         </div>
       </div>
+
+      {/* ========== SCROLL TO TOP BUTTON ========== */}
+      <motion.button
+        className="fixed bottom-6 right-6 p-3 rounded-xl footer-btn-gold
+                   shadow-lg z-50 group"
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.3 }}
+      >
+        <ArrowUpRight className="w-5 h-5 text-black group-hover:rotate-[-45deg] transition-transform duration-300" />
+      </motion.button>
     </footer>
   );
 };
