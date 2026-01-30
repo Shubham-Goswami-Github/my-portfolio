@@ -1,4 +1,4 @@
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import { LenisContext } from "../LenisProvider";
 import { 
@@ -456,7 +456,7 @@ const SkillStats = () => {
 /* -------------------- MAIN SKILLS SECTION -------------------- */
 const Skills = () => {
   const lenisRef = useContext(LenisContext);
-  const shouldReduceMotion = useReducedMotion();
+
   const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {
