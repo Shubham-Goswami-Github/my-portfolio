@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion} from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
 import { useContext, useEffect } from "react";
 import { 
@@ -6,7 +6,7 @@ import {
   FaUniversity, 
   FaStar, 
   FaCalendarAlt,
-  FaAward,
+ 
 } from "react-icons/fa";
 import { 
   BookOpen, 
@@ -20,9 +20,7 @@ import {
   User,
   Briefcase,
   Award,
-  TrendingUp,
-  Target,
-  Coffee
+  TrendingUp
 } from "lucide-react";
 import { LenisContext } from "../LenisProvider";
 
@@ -291,7 +289,7 @@ const SectionBadge = ({ text, icon: Icon }) => (
 
 /* -------------------- EDUCATION CARD (COLORFUL) -------------------- */
 const EducationCard = ({ edu, idx }) => {
-  const shouldReduceMotion = useReducedMotion();
+  
   const Icon = edu.icon;
 
   return (
@@ -470,7 +468,7 @@ const StatCard = ({ stat, index }) => {
 /* -------------------- MAIN ABOUT SECTION -------------------- */
 const About = () => {
   const lenisRef = useContext(LenisContext);
-  const shouldReduceMotion = useReducedMotion();
+  
 
   useEffect(() => {
     if (lenisRef?.current) {

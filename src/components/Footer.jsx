@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion} from "framer-motion";
 import { memo, useEffect, useState, useContext, useMemo } from "react";
 import { LenisContext } from "../LenisProvider";
 import { 
@@ -10,7 +10,7 @@ import {
   Heart,
   Code2,
   ChevronRight,
-  ExternalLink
+ 
 } from "lucide-react";
 import { 
   FaGithub, 
@@ -286,7 +286,7 @@ const SectionTitle = memo(({ title }) => (
 /* -------------------- MAIN FOOTER COMPONENT -------------------- */
 const Footer = () => {
   const lenisRef = useContext(LenisContext);
-  const shouldReduceMotion = useReducedMotion();
+
   const [visitors, setVisitors] = useState(0);
 
   useEffect(() => {

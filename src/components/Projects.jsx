@@ -1,8 +1,8 @@
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import { motion,  AnimatePresence } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import { LenisContext } from "../LenisProvider";
 import { 
-  Sparkles, 
+ 
   Code2, 
   ExternalLink,
   Github,
@@ -479,7 +479,7 @@ const ActionButton = ({ href, icon: Icon, label, variant = "default", accentColo
 
 /* -------------------- PROJECT CARD -------------------- */
 const ProjectCard = ({ project, index }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [setImageLoaded] = useState(false);
   const isEven = index % 2 === 0;
 
   return (
@@ -730,7 +730,7 @@ const StatsCard = ({ icon: Icon, value, label, index }) => (
 /* -------------------- MAIN PROJECTS SECTION -------------------- */
 const Projects = () => {
   const lenisRef = useContext(LenisContext);
-  const shouldReduceMotion = useReducedMotion();
+  
   const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {

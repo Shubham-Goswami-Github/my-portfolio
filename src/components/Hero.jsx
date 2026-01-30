@@ -6,7 +6,7 @@ import {
   useReducedMotion,
   AnimatePresence,
 } from "framer-motion";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState} from "react";
 import { 
   Github,
   Linkedin,
@@ -364,7 +364,7 @@ const AvailableBadge = () => (
 /* -------------------- MAIN HERO SECTION -------------------- */
 const Hero = () => {
   const lenisRef = useContext(LenisContext);
-  const prefersReducedMotion = useReducedMotion();
+ 
   const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
