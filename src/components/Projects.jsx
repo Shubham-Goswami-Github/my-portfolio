@@ -1,8 +1,7 @@
-import { motion,  AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import { LenisContext } from "../LenisProvider";
 import { 
- 
   Code2, 
   ExternalLink,
   Github,
@@ -125,16 +124,16 @@ if (typeof document !== 'undefined') {
       .project-image-blend-left {
         mask-image: linear-gradient(to right, 
           black 0%,
-          black 50%,
-          rgba(0,0,0,0.7) 70%,
-          rgba(0,0,0,0.3) 85%,
+          black 55%,
+          rgba(0,0,0,0.7) 75%,
+          rgba(0,0,0,0.3) 90%,
           transparent 100%
         );
         -webkit-mask-image: linear-gradient(to right, 
           black 0%,
-          black 50%,
-          rgba(0,0,0,0.7) 70%,
-          rgba(0,0,0,0.3) 85%,
+          black 55%,
+          rgba(0,0,0,0.7) 75%,
+          rgba(0,0,0,0.3) 90%,
           transparent 100%
         );
       }
@@ -142,16 +141,16 @@ if (typeof document !== 'undefined') {
       .project-image-blend-right {
         mask-image: linear-gradient(to left, 
           black 0%,
-          black 50%,
-          rgba(0,0,0,0.7) 70%,
-          rgba(0,0,0,0.3) 85%,
+          black 55%,
+          rgba(0,0,0,0.7) 75%,
+          rgba(0,0,0,0.3) 90%,
           transparent 100%
         );
         -webkit-mask-image: linear-gradient(to left, 
           black 0%,
-          black 50%,
-          rgba(0,0,0,0.7) 70%,
-          rgba(0,0,0,0.3) 85%,
+          black 55%,
+          rgba(0,0,0,0.7) 75%,
+          rgba(0,0,0,0.3) 90%,
           transparent 100%
         );
       }
@@ -159,14 +158,14 @@ if (typeof document !== 'undefined') {
       .project-image-blend-bottom {
         mask-image: linear-gradient(to bottom, 
           black 0%,
-          black 40%,
-          rgba(0,0,0,0.6) 70%,
+          black 50%,
+          rgba(0,0,0,0.6) 75%,
           transparent 100%
         );
         -webkit-mask-image: linear-gradient(to bottom, 
           black 0%,
-          black 40%,
-          rgba(0,0,0,0.6) 70%,
+          black 50%,
+          rgba(0,0,0,0.6) 75%,
           transparent 100%
         );
       }
@@ -272,7 +271,7 @@ const projects = [
     category: "fullstack",
     status: "In Progress",
     featured: true,
-    accentColor: "#06B6D4", // Cyan
+    accentColor: "#06B6D4",
     accentGradient: "from-cyan-500 to-blue-600",
     image:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/ecomnew.png",
@@ -292,7 +291,7 @@ const projects = [
     category: "fullstack",
     status: "Completed",
     featured: false,
-    accentColor: "#8B5CF6", // Purple
+    accentColor: "#8B5CF6",
     accentGradient: "from-purple-500 to-pink-600",
     image:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/evotenew.png",
@@ -312,7 +311,7 @@ const projects = [
     category: "mobile",
     status: "Completed",
     featured: false,
-    accentColor: "#10B981", // Emerald
+    accentColor: "#10B981",
     accentGradient: "from-emerald-500 to-teal-600",
     image:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/ftnew.png",
@@ -333,7 +332,7 @@ const projects = [
     category: "fullstack",
     status: "Completed",
     featured: false,
-    accentColor: "#F59E0B", // Amber
+    accentColor: "#F59E0B",
     accentGradient: "from-amber-500 to-orange-600",
     image:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/Screenshot%202025-09-25%20150607.png",
@@ -353,7 +352,7 @@ const projects = [
     category: "frontend",
     status: "Completed",
     featured: true,
-    accentColor: "#C9A86C", // Gold
+    accentColor: "#C9A86C",
     accentGradient: "from-amber-500 to-yellow-600",
     image:
       "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/portfolionew.png",
@@ -477,9 +476,10 @@ const ActionButton = ({ href, icon: Icon, label, variant = "default", accentColo
   );
 };
 
-/* -------------------- PROJECT CARD -------------------- */
+/* -------------------- PROJECT CARD (FIXED & ENHANCED) -------------------- */
 const ProjectCard = ({ project, index }) => {
-  const [setImageLoaded] = useState(false);
+  // ★★★ FIXED: Correct useState syntax ★★★
+  const [imageLoaded, setImageLoaded] = useState(false);
   const isEven = index % 2 === 0;
 
   return (
@@ -520,8 +520,8 @@ const ProjectCard = ({ project, index }) => {
       {/* Content Layout */}
       <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
         
-        {/* Image Section with Blended Background */}
-        <div className="relative lg:w-[45%] h-64 sm:h-72 lg:h-auto lg:min-h-[450px] overflow-hidden">
+        {/* ★★★ ENHANCED: Image Section - Increased Width ★★★ */}
+        <div className="relative lg:w-[50%] xl:w-[52%] h-72 sm:h-80 md:h-96 lg:h-auto lg:min-h-[500px] xl:min-h-[520px] overflow-hidden">
           
           {/* Colored background glow based on project accent */}
           <div 
@@ -531,12 +531,12 @@ const ProjectCard = ({ project, index }) => {
             }}
           />
 
-          {/* Image with blend effect */}
+          {/* Image with blend effect - Desktop */}
           <div className={`absolute inset-0 ${isEven ? 'project-image-blend-left' : 'project-image-blend-right'} lg:block hidden`}>
             <img
               src={project.image}
               alt={project.title}
-              className="project-image-hover w-full h-full object-cover object-center"
+              className={`project-image-hover w-full h-full object-cover object-center transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setImageLoaded(true)}
               loading="lazy"
             />
@@ -546,17 +546,24 @@ const ProjectCard = ({ project, index }) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
           </div>
 
-          {/* Mobile image with bottom blend */}
+          {/* Mobile image with bottom blend - Enhanced Height */}
           <div className="absolute inset-0 project-image-blend-bottom lg:hidden">
             <img
               src={project.image}
               alt={project.title}
-              className="project-image-hover w-full h-full object-cover object-top"
+              className={`project-image-hover w-full h-full object-cover object-top transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setImageLoaded(true)}
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black" />
           </div>
+
+          {/* Loading skeleton */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-neutral-900 animate-pulse flex items-center justify-center">
+              <div className="w-12 h-12 border-2 border-neutral-700 border-t-neutral-500 rounded-full animate-spin" />
+            </div>
+          )}
 
           {/* Hover overlay with quick links - Desktop only */}
           <motion.div 
@@ -594,76 +601,76 @@ const ProjectCard = ({ project, index }) => {
 
           {/* Accent corner glow */}
           <div 
-            className={`absolute ${isEven ? 'left-0' : 'right-0'} top-0 w-32 h-32 opacity-40 pointer-events-none hidden lg:block`}
+            className={`absolute ${isEven ? 'left-0' : 'right-0'} top-0 w-40 h-40 opacity-40 pointer-events-none hidden lg:block`}
             style={{ 
               background: `radial-gradient(circle at ${isEven ? 'top left' : 'top right'}, ${project.accentColor}40, transparent 70%)`,
             }}
           />
         </div>
 
-        {/* Content Section */}
-        <div className="lg:w-[55%] p-6 sm:p-8 lg:p-10 flex flex-col justify-center relative">
+        {/* ★★★ ADJUSTED: Content Section ★★★ */}
+        <div className="lg:w-[50%] xl:w-[48%] p-6 sm:p-8 lg:p-8 xl:p-10 flex flex-col justify-center relative">
           
           {/* Status Badge */}
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <StatusBadge status={project.status} />
           </div>
 
           {/* Title */}
-          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-white"
+          <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 sm:mb-4 text-white leading-tight"
               style={{ fontFamily: "'Outfit', sans-serif" }}>
             {project.title}
           </h3>
 
           {/* Accent line under title */}
           <div 
-            className="h-1 w-16 rounded-full mb-5"
+            className="h-1 w-14 sm:w-16 rounded-full mb-4 sm:mb-5"
             style={{ background: `linear-gradient(90deg, ${project.accentColor}, transparent)` }}
           />
 
           {/* Description */}
-          <p className="text-neutral-400 text-sm sm:text-base leading-relaxed mb-5"
+          <p className="text-neutral-400 text-sm sm:text-base leading-relaxed mb-4 sm:mb-5 line-clamp-3 lg:line-clamp-none"
              style={{ fontFamily: "'Inter', sans-serif" }}>
             {project.description}
           </p>
 
           {/* Duration */}
-          <div className="flex items-center gap-2 mb-5">
-            <Calendar className="w-4 h-4" style={{ color: project.accentColor }} />
-            <span className="text-sm text-neutral-500"
+          <div className="flex items-center gap-2 mb-4 sm:mb-5">
+            <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: project.accentColor }} />
+            <span className="text-xs sm:text-sm text-neutral-500"
                   style={{ fontFamily: "'Inter', sans-serif" }}>
               {project.duration}
             </span>
           </div>
 
-          {/* Learnings */}
-          <div className="mb-6 p-4 rounded-xl border"
+          {/* Learnings - Compact on smaller screens */}
+          <div className="mb-5 sm:mb-6 p-3 sm:p-4 rounded-xl border"
                style={{ 
                  background: `${project.accentColor}08`,
                  borderColor: `${project.accentColor}20`
                }}>
             <div className="flex items-center gap-2 mb-2">
-              <Lightbulb className="w-4 h-4" style={{ color: project.accentColor }} />
-              <span className="text-sm font-semibold" style={{ color: project.accentColor, fontFamily: "'Outfit', sans-serif" }}>
+              <Lightbulb className="w-4 h-4 flex-shrink-0" style={{ color: project.accentColor }} />
+              <span className="text-xs sm:text-sm font-semibold" style={{ color: project.accentColor, fontFamily: "'Outfit', sans-serif" }}>
                 Key Learnings
               </span>
             </div>
-            <p className="text-sm text-neutral-400 leading-relaxed"
+            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed line-clamp-2 lg:line-clamp-none"
                style={{ fontFamily: "'Inter', sans-serif" }}>
               {project.learnings}
             </p>
           </div>
 
           {/* Technologies */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Layers className="w-4 h-4" style={{ color: project.accentColor }} />
-              <span className="text-sm font-semibold text-neutral-300"
+          <div className="mb-5 sm:mb-6">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <Layers className="w-4 h-4 flex-shrink-0" style={{ color: project.accentColor }} />
+              <span className="text-xs sm:text-sm font-semibold text-neutral-300"
                     style={{ fontFamily: "'Outfit', sans-serif" }}>
                 Tech Stack
               </span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {project.technologies.map((tech) => (
                 <TechTag key={tech} tech={tech} />
               ))}
@@ -671,7 +678,7 @@ const ProjectCard = ({ project, index }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <ActionButton 
               href={project.github} 
               icon={FaGithub} 
@@ -730,7 +737,6 @@ const StatsCard = ({ icon: Icon, value, label, index }) => (
 /* -------------------- MAIN PROJECTS SECTION -------------------- */
 const Projects = () => {
   const lenisRef = useContext(LenisContext);
-  
   const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {

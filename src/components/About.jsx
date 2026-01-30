@@ -677,7 +677,7 @@ const About = () => {
               
               {/* Blended Photo - Top */}
               <motion.div
-                className="relative h-[300px] sm:h-[350px] overflow-hidden"
+                className="relative h-[500px] sm:h-[600px] md:h-[500px] overflow-hidden"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.6 }}

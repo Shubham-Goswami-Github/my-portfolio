@@ -1,44 +1,137 @@
+// api/sendMail.js
+
 import mailjet from "node-mailjet";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST")
+  // ★ CORS Headers - Important for cross-origin requests
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
 
   const { email, name, status } = req.body;
 
-  const mj = mailjet.apiConnect(
-    process.env.MAILJET_PUBLIC,
-    process.env.MAILJET_PRIVATE
-  );
+  // ★ Validate input
+  if (!email || !name || !status) {
+    return res.status(400).json({ 
+      error: "Missing required fields",
+      received: { email: !!email, name: !!name, status: !!status }
+    });
+  }
+
+  // ★ Check environment variables
+  if (!process.env.MAILJET_PUBLIC || !process.env.MAILJET_PRIVATE) {
+    console.error("❌ Mailjet credentials not found in environment variables");
+    return res.status(500).json({ 
+      error: "Server configuration error - Missing email credentials" 
+    });
+  }
 
   try {
+    const mj = mailjet.apiConnect(
+      process.env.MAILJET_PUBLIC,
+      process.env.MAILJET_PRIVATE
+    );
+
     const isApproved = status === "Approved";
 
     const subject = isApproved
-      ? "✅ Your Resume Download Link"
-      : "❌ Resume Request Denied";
+      ? "✅ Your Resume Download Link - Shubham Das Goswami"
+      : "❌ Resume Request Update";
+
+    const htmlContent = isApproved
+      ? `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #C9A86C, #D4AF37); padding: 30px; border-radius: 16px 16px 0 0; text-align: center;">
+            <h1 style="color: #000; margin: 0; font-size: 24px;">✅ Request Approved!</h1>
+          </div>
+          <div style="background: #1a1a1a; padding: 30px; border-radius: 0 0 16px 16px; color: #fff;">
+            <p style="font-size: 16px; color: #e5e5e5;">Hello <strong style="color: #C9A86C;">${name}</strong>,</p>
+            <p style="font-size: 16px; color: #a3a3a3; line-height: 1.6;">
+              Great news! Your resume download request has been approved.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="https://drive.google.com/file/d/1t2OyqQyQj5Aq0HWwgjVFytAXPq1XTTak/view?usp=drive_link" 
+                 style="display: inline-block; background: linear-gradient(135deg, #C9A86C, #D4AF37); 
+                        color: #000; padding: 14px 32px; border-radius: 10px; text-decoration: none; 
+                        font-weight: bold; font-size: 16px;">
+                📄 Download Resume
+              </a>
+            </div>
+            <p style="font-size: 14px; color: #737373; text-align: center;">
+              Thank you for your interest!
+            </p>
+            <hr style="border: none; border-top: 1px solid #333; margin: 20px 0;">
+            <p style="font-size: 12px; color: #525252; text-align: center;">
+              — Shubham Das Goswami | Web Developer
+            </p>
+          </div>
+        </div>
+      `
+      : `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: #dc2626; padding: 30px; border-radius: 16px 16px 0 0; text-align: center;">
+            <h1 style="color: #fff; margin: 0; font-size: 24px;">Request Update</h1>
+          </div>
+          <div style="background: #1a1a1a; padding: 30px; border-radius: 0 0 16px 16px; color: #fff;">
+            <p style="font-size: 16px; color: #e5e5e5;">Hello <strong>${name}</strong>,</p>
+            <p style="font-size: 16px; color: #a3a3a3; line-height: 1.6;">
+              Thank you for your interest. Unfortunately, your resume request could not be approved at this time.
+            </p>
+            <p style="font-size: 14px; color: #737373;">
+              If you have any questions, feel free to reach out.
+            </p>
+            <hr style="border: none; border-top: 1px solid #333; margin: 20px 0;">
+            <p style="font-size: 12px; color: #525252; text-align: center;">
+              — Shubham Das Goswami
+            </p>
+          </div>
+        </div>
+      `;
 
     const textContent = isApproved
-      ? `Hello, ${name},\nYour resume request is approved.\nDownload here: https://drive.google.com/file/d/1t2OyqQyQj5Aq0HWwgjVFytAXPq1XTTak/view?usp=drive_link`
-      : `Hello, ${name},\nSorry, your resume request was not approved.`;
+      ? `Hello ${name},\n\nYour resume request is approved!\n\nDownload here: https://drive.google.com/file/d/1t2OyqQyQj5Aq0HWwgjVFytAXPq1XTTak/view?usp=drive_link\n\nThank you!\n— Shubham Das Goswami`
+      : `Hello ${name},\n\nThank you for your interest. Unfortunately, your resume request could not be approved at this time.\n\n— Shubham Das Goswami`;
 
-    await mj.post("send", { version: "v3.1" }).request({
+    console.log("📧 Sending email to:", email);
+
+    const result = await mj.post("send", { version: "v3.1" }).request({
       Messages: [
         {
           From: {
             Email: "qis2k2535@gmail.com",
-            Name: "Portfolio Admin",
+            Name: "Shubham Das Goswami",
           },
           To: [{ Email: email, Name: name }],
           Subject: subject,
           TextPart: textContent,
+          HTMLPart: htmlContent,
         },
       ],
     });
 
-    return res.status(200).json({ success: true });
+    console.log("✅ Email sent successfully:", result.body);
+
+    return res.status(200).json({ 
+      success: true,
+      message: `Email sent to ${email}`
+    });
+
   } catch (error) {
-    console.log("Mailjet Error:", error);
-    return res.status(500).json({ error: "Failed to send email" });
+    console.error("❌ Mailjet Error:", error.message);
+    console.error("Full error:", JSON.stringify(error, null, 2));
+    
+    return res.status(500).json({ 
+      error: "Failed to send email",
+      details: error.message || "Unknown error"
+    });
   }
 }
