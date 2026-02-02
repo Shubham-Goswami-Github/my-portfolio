@@ -1,8 +1,10 @@
 // api/sendMail.js
 
-import Mailjet from "node-mailjet";
+const Mailjet = require("node-mailjet");
 
-export default async function handler(req, res) {
+
+module.exports = async function handler(req, res) {
+
   // ★ CORS Headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -61,7 +63,7 @@ export default async function handler(req, res) {
 
   try {
     // ★ Initialize Mailjet client - FIXED IMPORT
-    const mailjet = Mailjet.apiConnect(MAILJET_PUBLIC, MAILJET_PRIVATE);
+   const mailjet = Mailjet.connect(MAILJET_PUBLIC, MAILJET_PRIVATE);
 
     const isApproved = status === "Approved";
 
