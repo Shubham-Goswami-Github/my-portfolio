@@ -2,21 +2,22 @@ import { useState, useEffect } from "react";
 import { collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import axios from "axios";
-import { 
-  X, 
-  Check, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Mail, 
-  User, 
+import {
+  X,
+  Check,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Mail,
+  User,
   MessageSquare,
   Menu,
   Sparkles,
   AlertTriangle,
   Loader2,
   Calendar,
-  Shield
+  Shield,
+  RefreshCw
 } from "lucide-react";
 
 /* -------------------- INJECT PREMIUM STYLES -------------------- */
@@ -144,7 +145,6 @@ if (typeof document !== "undefined") {
         border: 1px solid rgba(201, 168, 108, 0.15);
       }
       
-      /* Smooth animations */
       @keyframes admin-slide-in {
         from {
           transform: translateX(100%);
@@ -202,7 +202,6 @@ if (typeof document !== "undefined") {
         animation: admin-pulse 2s ease-in-out infinite;
       }
       
-      /* Scrollbar */
       .admin-scrollbar::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -238,7 +237,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   // Modal States
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -249,37 +248,33 @@ const AdminDashboard = () => {
   // Toast State
   const [toast, setToast] = useState({ show: false, message: "", type: "", details: "" });
 
-  // ★★★ FIX: Use relative URL for same-origin, absolute for cross-origin ★★★
+  // ★★★ FIX: Better API URL configuration ★★★
   const getApiUrl = () => {
-    // Check if we're in development
+    // Check if running on localhost
     if (typeof window !== "undefined") {
       const hostname = window.location.hostname;
-      
-      // If localhost, use local API
       if (hostname === "localhost" || hostname === "127.0.0.1") {
-        return "/api/sendMail";
+        return "http://localhost:3000/api/sendMail";
       }
-      
-      // If on Vercel (same domain), use relative URL
-      if (hostname.includes("vercel.app") || hostname.includes("myportfoliosg8990")) {
-        return "/api/sendMail";
-      }
-      
-      // Fallback to absolute URL
-      return "https://myportfoliosg8990.vercel.app/api/sendMail";
     }
-    
-    return "/api/sendMail";
+    // Production URL - UPDATE THIS TO YOUR VERCEL URL
+    return "/api/sendMail"; // Relative URL works on same domain
   };
+
+  const API_URL = getApiUrl();
+
+  useEffect(() => {
+    console.log("🔗 Using API URL:", API_URL);
+  }, [API_URL]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "resume_requests"), 
+      collection(db, "resume_requests"),
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-          name: doc.data().Sname || doc.data().name,
+          name: doc.data().Sname || doc.data().name
         }));
         // Sort by createdAt descending (newest first)
         data.sort((a, b) => {
@@ -304,76 +299,76 @@ const AdminDashboard = () => {
     if (toast.show) {
       const timer = setTimeout(() => {
         setToast({ show: false, message: "", type: "", details: "" });
-      }, 5000);
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, [toast.show]);
 
-  // ★★★ FIX: Improved sendMail function with better error handling ★★★
+  // ★★★ FIX: Improved sendMail with detailed error handling ★★★
   const sendMail = async (email, name, status) => {
-    const API_URL = getApiUrl();
-    console.log("📧 Sending mail request...");
-    console.log("📧 API URL:", API_URL);
-    console.log("📧 Data:", { email, name, status });
-    
+    console.log("📧 Attempting to send mail...");
+    console.log("   Email:", email);
+    console.log("   Name:", name);
+    console.log("   Status:", status);
+    console.log("   API URL:", API_URL);
+
     try {
-      const response = await axios({
-        method: 'POST',
-        url: API_URL,
-        data: { 
-          email: email.trim(), 
-          name: name.trim(), 
-          status: status 
+      const response = await axios.post(
+        API_URL,
+        {
+          email: email,
+          name: name,
+          status: status
         },
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        timeout: 30000, // 30 second timeout
-        validateStatus: function (status) {
-          return status < 500; // Resolve only if status is less than 500
+        {
+          timeout: 30000, // 30 second timeout
+          headers: {
+            "Content-Type": "application/json"
+          }
         }
-      });
-      
-      console.log("📧 Response status:", response.status);
-      console.log("📧 Response data:", response.data);
-      
-      if (response.status === 200 && response.data.success) {
-        console.log("✅ Mail sent successfully!");
+      );
+
+      console.log("✅ Mail API Response:", response.data);
+
+      if (response.data.success) {
         return { success: true, data: response.data };
       } else {
-        // Handle non-success responses
-        const errorMsg = response.data?.error || response.data?.message || `Status: ${response.status}`;
-        console.error("❌ Mail sending failed:", errorMsg);
-        return { success: false, error: errorMsg };
+        return {
+          success: false,
+          error: response.data.error || "Unknown error from API"
+        };
       }
-      
     } catch (error) {
-      console.error("❌ Mail sending exception:", error);
-      
+      console.error("❌ Mail sending failed:", error);
+
       // Get detailed error message
-      let errorMessage = "Unknown error occurred";
-      
-      if (error.code === "ECONNABORTED") {
-        errorMessage = "Request timeout - server took too long to respond";
-      } else if (error.code === "ERR_NETWORK") {
-        errorMessage = "Network error - check your internet connection or API endpoint";
-      } else if (error.response) {
-        // Server responded with error status
-        console.error("❌ Server error response:", error.response.data);
-        errorMessage = error.response.data?.error || 
-                       error.response.data?.message || 
-                       error.response.data?.details ||
-                       `Server error: ${error.response.status}`;
+      let errorMessage = "Unknown error";
+      let errorDetails = null;
+
+      if (error.response) {
+        // Server responded with error
+        console.error("❌ Server Error Response:", error.response.data);
+        errorMessage = error.response.data?.error || `Server error: ${error.response.status}`;
+        errorDetails = error.response.data?.details;
+
+        // Check for specific Mailjet errors
+        if (error.response.data?.hint) {
+          errorMessage += ` - ${error.response.data.hint}`;
+        }
       } else if (error.request) {
-        // Request made but no response received
-        errorMessage = "No response from server. The API might be down or unreachable.";
+        // Request made but no response
+        errorMessage = "No response from server. API might be down or unreachable.";
+        console.error("❌ No response received. Request:", error.request);
       } else {
         // Error in setting up request
-        errorMessage = error.message || "Failed to send request";
+        errorMessage = error.message;
       }
-      
-      return { success: false, error: errorMessage };
+
+      return {
+        success: false,
+        error: errorMessage,
+        details: errorDetails
+      };
     }
   };
 
@@ -386,10 +381,10 @@ const AdminDashboard = () => {
     setShowConfirmModal(true);
   };
 
-  // ★★★ FIX: Improved handleConfirmAction with proper flow ★★★
+  // ★★★ FIX: Improved handleConfirmAction ★★★
   const handleConfirmAction = async () => {
     if (!modalData) return;
-    
+
     const { id, name, email, action } = modalData;
     setActionLoading(id);
     setShowConfirmModal(false);
@@ -397,71 +392,83 @@ const AdminDashboard = () => {
     const newStatus = action === "Approve" ? "Approved" : "Denied";
 
     try {
-      // Step 1: Update Firestore FIRST
-      console.log("📝 Step 1: Updating Firestore...");
-      console.log("📝 Document ID:", id);
-      console.log("📝 New Status:", newStatus);
-      
-      await updateDoc(doc(db, "resume_requests", id), { 
-        status: newStatus,
-        updatedAt: new Date()
-      });
-      console.log("✅ Firestore updated successfully");
-
-      // Step 2: Send Email
-      console.log("📧 Step 2: Sending email notification...");
+      // Step 1: Send Email FIRST (so we don't update status if email fails)
+      console.log("📧 Step 1: Sending email...");
       const mailResult = await sendMail(email, name, newStatus);
-      console.log("📧 Mail result:", mailResult);
 
       if (mailResult.success) {
-        // Both operations succeeded
+        // Step 2: Update Firestore only if email sent successfully
+        console.log("📝 Step 2: Updating Firestore...");
+        await updateDoc(doc(db, "resume_requests", id), {
+          status: newStatus,
+          updatedAt: new Date(),
+          emailSent: true,
+          emailSentAt: new Date()
+        });
+        console.log("✅ Firestore updated successfully");
+
+        // Both succeeded
         setSuccessType(action === "Approve" ? "approve" : "deny");
         setSuccessMessage(
           action === "Approve"
-            ? `✅ Resume approved!\n\nEmail with resume link sent to:\n${email}`
-            : `❌ Request denied.\n\nNotification sent to:\n${email}`
+            ? `Resume approved! Email sent to ${email}`
+            : `Request denied. Notification sent to ${email}`
         );
-        showToast(`Successfully ${action.toLowerCase()}d request for ${name}`, "success");
+        showToast(`${action}d request for ${name}`, "success");
         setShowSuccessModal(true);
       } else {
-        // Firestore updated but email failed
-        console.warn("⚠️ Status updated but email failed:", mailResult.error);
-        showToast(
-          `Status updated but email failed`, 
-          "warning", 
-          mailResult.error
-        );
-        setSuccessType(action === "Approve" ? "approve" : "deny");
+        // Email failed - show detailed error
+        console.error("❌ Email failed:", mailResult.error);
+
+        let detailsText = mailResult.error;
+        if (mailResult.details) {
+          detailsText += `\n\nDetails: ${JSON.stringify(mailResult.details, null, 2)}`;
+        }
+
+        showToast("Email sending failed", "error", detailsText);
+
+        // Ask if user wants to update status anyway
+        setSuccessType("warning");
         setSuccessMessage(
-          `⚠️ Status updated to "${newStatus}"\n\nHowever, email notification failed.\n\nError: ${mailResult.error}\n\nYou may need to contact ${email} manually.`
+          `⚠️ Email could not be sent to ${email}\n\nError: ${mailResult.error}\n\nThe request status was NOT updated. Please check:\n1. Mailjet API keys in Vercel\n2. Sender email is verified in Mailjet\n3. You haven't exceeded rate limits`
         );
         setShowSuccessModal(true);
       }
-
     } catch (error) {
       console.error("❌ Action failed:", error);
-      
+
       // Show detailed error
       let errorMessage = "Something went wrong!";
       let errorDetails = "";
-      
+
       if (error.code) {
-        // Firebase error
-        errorDetails = `Firebase Error: ${error.code}`;
-        if (error.code === "permission-denied") {
-          errorDetails = "Permission denied. Check Firebase rules.";
-        } else if (error.code === "not-found") {
-          errorDetails = "Document not found. It may have been deleted.";
-        }
+        errorDetails = `Firebase Error: ${error.code} - ${error.message}`;
       } else if (error.message) {
         errorDetails = error.message;
       }
-      
+
       showToast(errorMessage, "error", errorDetails);
     } finally {
       setActionLoading(null);
       setModalData(null);
     }
+  };
+
+  // ★ Manual resend email function
+  const resendEmail = async (req) => {
+    setActionLoading(req.id);
+    const mailResult = await sendMail(req.email, req.name, req.status);
+
+    if (mailResult.success) {
+      await updateDoc(doc(db, "resume_requests", req.id), {
+        emailSent: true,
+        emailSentAt: new Date()
+      });
+      showToast(`Email resent to ${req.email}`, "success");
+    } else {
+      showToast("Failed to resend email", "error", mailResult.error);
+    }
+    setActionLoading(null);
   };
 
   const filteredRequests = requests.filter((r) => r.status === filter);
@@ -470,27 +477,23 @@ const AdminDashboard = () => {
     pending: requests.filter((r) => r.status === "Pending").length,
     approved: requests.filter((r) => r.status === "Approved").length,
     denied: requests.filter((r) => r.status === "Denied").length,
-    total: requests.length,
+    total: requests.length
   };
 
   const formatDate = (timestamp) => {
     if (!timestamp) return "No date";
-    try {
-      const date = timestamp.toDate?.() || new Date(timestamp);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (e) {
-      return "Invalid date";
-    }
+    const date = timestamp.toDate?.() || new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex admin-bg-pure-black admin-scrollbar"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
@@ -504,20 +507,24 @@ const AdminDashboard = () => {
       {/* ==================== TOAST NOTIFICATION ==================== */}
       {toast.show && (
         <div className="fixed top-6 right-6 z-[100] admin-animate-slide-in">
-          <div className={`flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl backdrop-blur-xl border max-w-md ${
-            toast.type === "success" 
-              ? "bg-emerald-500/10 border-emerald-500/30" 
-              : toast.type === "warning"
-              ? "bg-amber-500/10 border-amber-500/30"
-              : "bg-red-500/10 border-red-500/30"
-          }`}>
-            <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-              toast.type === "success" 
-                ? "bg-emerald-500/20" 
+          <div
+            className={`flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl backdrop-blur-xl border max-w-md ${
+              toast.type === "success"
+                ? "bg-emerald-500/10 border-emerald-500/30"
                 : toast.type === "warning"
-                ? "bg-amber-500/20"
-                : "bg-red-500/20"
-            }`}>
+                ? "bg-amber-500/10 border-amber-500/30"
+                : "bg-red-500/10 border-red-500/30"
+            }`}
+          >
+            <div
+              className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                toast.type === "success"
+                  ? "bg-emerald-500/20"
+                  : toast.type === "warning"
+                  ? "bg-amber-500/20"
+                  : "bg-red-500/20"
+              }`}
+            >
               {toast.type === "success" ? (
                 <CheckCircle className="w-5 h-5 text-emerald-400" />
               ) : toast.type === "warning" ? (
@@ -527,22 +534,24 @@ const AdminDashboard = () => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`font-medium ${
-                toast.type === "success" 
-                  ? "text-emerald-300" 
-                  : toast.type === "warning"
-                  ? "text-amber-300"
-                  : "text-red-300"
-              }`}>
+              <p
+                className={`font-medium ${
+                  toast.type === "success"
+                    ? "text-emerald-300"
+                    : toast.type === "warning"
+                    ? "text-amber-300"
+                    : "text-red-300"
+                }`}
+              >
                 {toast.message}
               </p>
               {toast.details && (
-                <p className="text-xs text-neutral-500 mt-1 break-words">
+                <p className="text-xs text-neutral-500 mt-1 break-words whitespace-pre-wrap">
                   {toast.details}
                 </p>
               )}
             </div>
-            <button 
+            <button
               onClick={() => setToast({ show: false, message: "", type: "", details: "" })}
               className="flex-shrink-0 text-neutral-500 hover:text-white transition p-1"
             >
@@ -555,14 +564,14 @@ const AdminDashboard = () => {
       {/* ==================== CONFIRM MODAL ==================== */}
       {showConfirmModal && modalData && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 admin-modal-backdrop"
             onClick={() => setShowConfirmModal(false)}
           />
           <div className="relative admin-modal-card rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl admin-animate-scale-in">
             {/* Noise overlay */}
             <div className="absolute inset-0 admin-noise-texture rounded-2xl pointer-events-none" />
-            
+
             {/* Corner accents */}
             <div className="absolute top-0 left-0 w-8 h-8 pointer-events-none">
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-[#C9A86C]/40 to-transparent" />
@@ -575,11 +584,13 @@ const AdminDashboard = () => {
 
             <div className="relative z-10">
               {/* Icon */}
-              <div className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5 ${
-                modalData.action === "Approve" 
-                  ? "bg-emerald-500/10 border border-emerald-500/30" 
-                  : "bg-red-500/10 border border-red-500/30"
-              }`}>
+              <div
+                className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5 ${
+                  modalData.action === "Approve"
+                    ? "bg-emerald-500/10 border border-emerald-500/30"
+                    : "bg-red-500/10 border border-red-500/30"
+                }`}
+              >
                 {modalData.action === "Approve" ? (
                   <Check className="w-8 h-8 text-emerald-400" />
                 ) : (
@@ -588,16 +599,17 @@ const AdminDashboard = () => {
               </div>
 
               {/* Title */}
-              <h3 className="text-xl sm:text-2xl font-bold text-white text-center mb-2"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}>
+              <h3
+                className="text-xl sm:text-2xl font-bold text-white text-center mb-2"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
                 {modalData.action === "Approve" ? "Approve Request?" : "Deny Request?"}
               </h3>
-              
+
               <p className="text-neutral-400 text-sm text-center mb-5">
-                {modalData.action === "Approve" 
+                {modalData.action === "Approve"
                   ? "This will send an approval email with resume access."
-                  : "This will notify the user that their request was denied."
-                }
+                  : "This will notify the user that their request was denied."}
               </p>
 
               {/* User Info Card */}
@@ -625,9 +637,7 @@ const AdminDashboard = () => {
                 <button
                   onClick={handleConfirmAction}
                   className={`flex-1 py-3 rounded-xl transition font-semibold text-white ${
-                    modalData.action === "Approve"
-                      ? "admin-btn-approve"
-                      : "admin-btn-deny"
+                    modalData.action === "Approve" ? "admin-btn-approve" : "admin-btn-deny"
                   }`}
                 >
                   {modalData.action === "Approve" ? "Yes, Approve" : "Yes, Deny"}
@@ -641,7 +651,7 @@ const AdminDashboard = () => {
       {/* ==================== SUCCESS MODAL ==================== */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 admin-modal-backdrop"
             onClick={() => setShowSuccessModal(false)}
           />
@@ -651,23 +661,33 @@ const AdminDashboard = () => {
 
             <div className="relative z-10">
               {/* Success Icon */}
-              <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-5 ${
-                successType === "approve" 
-                  ? "bg-emerald-500/10 border-2 border-emerald-500/40"
-                  : "bg-red-500/10 border-2 border-red-500/40"
-              }`}>
+              <div
+                className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-5 ${
+                  successType === "approve"
+                    ? "bg-emerald-500/10 border-2 border-emerald-500/40"
+                    : successType === "warning"
+                    ? "bg-amber-500/10 border-2 border-amber-500/40"
+                    : "bg-red-500/10 border-2 border-red-500/40"
+                }`}
+              >
                 {successType === "approve" ? (
                   <CheckCircle className="w-10 h-10 text-emerald-400" />
+                ) : successType === "warning" ? (
+                  <AlertTriangle className="w-10 h-10 text-amber-400" />
                 ) : (
                   <XCircle className="w-10 h-10 text-red-400" />
                 )}
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-3"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}>
-                Action Completed!
+              <h3
+                className="text-xl sm:text-2xl font-bold text-white mb-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                {successType === "warning" ? "Action Required" : "Action Completed!"}
               </h3>
-              <p className="text-neutral-400 text-sm mb-6 whitespace-pre-line">{successMessage}</p>
+              <p className="text-neutral-400 text-sm mb-6 whitespace-pre-line text-left">
+                {successMessage}
+              </p>
 
               <button
                 onClick={() => setShowSuccessModal(false)}
@@ -675,7 +695,7 @@ const AdminDashboard = () => {
                          transition"
                 style={{ fontFamily: "'Outfit', sans-serif" }}
               >
-                Continue
+                {successType === "warning" ? "Understood" : "Continue"}
               </button>
             </div>
           </div>
@@ -692,11 +712,12 @@ const AdminDashboard = () => {
       </button>
 
       {/* ==================== SIDEBAR ==================== */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-[50] w-72 transform transition-transform duration-300 ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-      }`}>
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-[50] w-72 transform transition-transform duration-300 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
+      >
         <div className="h-full admin-sidebar p-5 flex flex-col overflow-y-auto admin-scrollbar">
-          
           {/* Logo/Header */}
           <div className="mb-8 pt-2">
             <div className="flex items-center gap-3 mb-1">
@@ -748,23 +769,26 @@ const AdminDashboard = () => {
             <p className="text-[10px] uppercase tracking-widest text-neutral-600 mb-3 px-2 font-medium">
               Navigation
             </p>
-            
+
             {/* Pending */}
             <button
               className={`admin-nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
                 filter === "Pending" ? "active" : ""
               }`}
-              onClick={() => { setFilter("Pending"); setSidebarOpen(false); }}
+              onClick={() => {
+                setFilter("Pending");
+                setSidebarOpen(false);
+              }}
             >
               <Clock className={`w-5 h-5 ${filter === "Pending" ? "text-amber-400" : "text-neutral-500"}`} />
               <span className={`font-medium ${filter === "Pending" ? "text-amber-400" : "text-neutral-400"}`}>
                 Pending
               </span>
-              <span className={`ml-auto px-2 py-0.5 rounded-md text-xs font-bold ${
-                filter === "Pending" 
-                  ? "bg-amber-500 text-black" 
-                  : "bg-neutral-800 text-neutral-400"
-              }`}>
+              <span
+                className={`ml-auto px-2 py-0.5 rounded-md text-xs font-bold ${
+                  filter === "Pending" ? "bg-amber-500 text-black" : "bg-neutral-800 text-neutral-400"
+                }`}
+              >
                 {stats.pending}
               </span>
             </button>
@@ -774,17 +798,22 @@ const AdminDashboard = () => {
               className={`admin-nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
                 filter === "Approved" ? "active" : ""
               }`}
-              onClick={() => { setFilter("Approved"); setSidebarOpen(false); }}
+              onClick={() => {
+                setFilter("Approved");
+                setSidebarOpen(false);
+              }}
             >
-              <CheckCircle className={`w-5 h-5 ${filter === "Approved" ? "text-emerald-400" : "text-neutral-500"}`} />
+              <CheckCircle
+                className={`w-5 h-5 ${filter === "Approved" ? "text-emerald-400" : "text-neutral-500"}`}
+              />
               <span className={`font-medium ${filter === "Approved" ? "text-emerald-400" : "text-neutral-400"}`}>
                 Approved
               </span>
-              <span className={`ml-auto px-2 py-0.5 rounded-md text-xs font-bold ${
-                filter === "Approved" 
-                  ? "bg-emerald-500 text-black" 
-                  : "bg-neutral-800 text-neutral-400"
-              }`}>
+              <span
+                className={`ml-auto px-2 py-0.5 rounded-md text-xs font-bold ${
+                  filter === "Approved" ? "bg-emerald-500 text-black" : "bg-neutral-800 text-neutral-400"
+                }`}
+              >
                 {stats.approved}
               </span>
             </button>
@@ -794,17 +823,20 @@ const AdminDashboard = () => {
               className={`admin-nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
                 filter === "Denied" ? "active" : ""
               }`}
-              onClick={() => { setFilter("Denied"); setSidebarOpen(false); }}
+              onClick={() => {
+                setFilter("Denied");
+                setSidebarOpen(false);
+              }}
             >
               <XCircle className={`w-5 h-5 ${filter === "Denied" ? "text-red-400" : "text-neutral-500"}`} />
               <span className={`font-medium ${filter === "Denied" ? "text-red-400" : "text-neutral-400"}`}>
                 Denied
               </span>
-              <span className={`ml-auto px-2 py-0.5 rounded-md text-xs font-bold ${
-                filter === "Denied" 
-                  ? "bg-red-500 text-black" 
-                  : "bg-neutral-800 text-neutral-400"
-              }`}>
+              <span
+                className={`ml-auto px-2 py-0.5 rounded-md text-xs font-bold ${
+                  filter === "Denied" ? "bg-red-500 text-black" : "bg-neutral-800 text-neutral-400"
+                }`}
+              >
                 {stats.denied}
               </span>
             </button>
@@ -827,15 +859,11 @@ const AdminDashboard = () => {
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/60 z-[40]"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="lg:hidden fixed inset-0 bg-black/60 z-[40]" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ==================== MAIN CONTENT ==================== */}
       <main className="flex-1 min-h-screen overflow-auto admin-scrollbar relative z-10">
-        
         {/* Header */}
         <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-xl border-b border-neutral-800/50 px-6 lg:px-10 py-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -846,12 +874,14 @@ const AdminDashboard = () => {
                   Resume Requests
                 </p>
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold admin-gold-gradient-text"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}>
+              <h1
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold admin-gold-gradient-text"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
                 {filter} Requests
               </h1>
             </div>
-            
+
             <div className="hidden md:flex items-center gap-4">
               <div className="admin-card rounded-xl px-5 py-3">
                 <p className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1">Total</p>
@@ -866,7 +896,6 @@ const AdminDashboard = () => {
         {/* Content */}
         <div className="p-6 lg:p-10">
           <div className="max-w-7xl mx-auto">
-            
             {/* Loading State */}
             {loading ? (
               <div className="flex flex-col items-center justify-center py-24">
@@ -904,24 +933,29 @@ const AdminDashboard = () => {
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {/* Status Bar */}
-                    <div className={`h-1 ${
-                      req.status === "Approved" 
-                        ? "bg-gradient-to-r from-emerald-500 to-teal-500"
-                        : req.status === "Denied"
-                        ? "bg-gradient-to-r from-red-500 to-rose-500"
-                        : "bg-gradient-to-r from-amber-500 to-orange-500"
-                    }`} />
+                    <div
+                      className={`h-1 ${
+                        req.status === "Approved"
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                          : req.status === "Denied"
+                          ? "bg-gradient-to-r from-red-500 to-rose-500"
+                          : "bg-gradient-to-r from-amber-500 to-orange-500"
+                      }`}
+                    />
 
                     <div className="p-5">
                       {/* User Info */}
                       <div className="flex items-start gap-4 mb-4">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold ${
-                          req.status === "Approved"
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : req.status === "Denied"
-                            ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                        }`} style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <div
+                          className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold ${
+                            req.status === "Approved"
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                              : req.status === "Denied"
+                              ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                              : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                          }`}
+                          style={{ fontFamily: "'Outfit', sans-serif" }}
+                        >
                           {req.name?.charAt(0)?.toUpperCase() || "?"}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -955,15 +989,17 @@ const AdminDashboard = () => {
                               : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                           }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            req.status === "Pending" ? "admin-animate-pulse" : ""
-                          } ${
-                            req.status === "Approved"
-                              ? "bg-emerald-400"
-                              : req.status === "Denied"
-                              ? "bg-red-400"
-                              : "bg-amber-400"
-                          }`} />
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              req.status === "Pending" ? "admin-animate-pulse" : ""
+                            } ${
+                              req.status === "Approved"
+                                ? "bg-emerald-400"
+                                : req.status === "Denied"
+                                ? "bg-red-400"
+                                : "bg-amber-400"
+                            }`}
+                          />
                           {req.status}
                         </span>
                         <span className="text-[11px] text-neutral-600 flex items-center gap-1">
@@ -1010,16 +1046,27 @@ const AdminDashboard = () => {
                         </div>
                       )}
 
-                      {/* Completed Status */}
+                      {/* Completed Status with Resend Option */}
                       {req.status !== "Pending" && (
                         <div className="pt-4 border-t border-neutral-800/50">
-                          <p className="text-center text-xs text-neutral-600 flex items-center justify-center gap-1.5">
-                            <Mail className="w-3.5 h-3.5" />
-                            {req.status === "Approved" 
-                              ? "Approval email sent" 
-                              : "Denial notification sent"
-                            }
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs text-neutral-600 flex items-center gap-1.5">
+                              <Mail className="w-3.5 h-3.5" />
+                              {req.status === "Approved" ? "Approval email sent" : "Denial notification sent"}
+                            </p>
+                            <button
+                              onClick={() => resendEmail(req)}
+                              disabled={actionLoading === req.id}
+                              className="text-xs text-[#C9A86C] hover:text-[#E8D5B5] flex items-center gap-1 transition"
+                            >
+                              {actionLoading === req.id ? (
+                                <Loader2 className="w-3 h-3 admin-animate-spin" />
+                              ) : (
+                                <RefreshCw className="w-3 h-3" />
+                              )}
+                              Resend
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
