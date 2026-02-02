@@ -63,7 +63,11 @@ module.exports = async function handler(req, res) {
 
   try {
     // ★ Initialize Mailjet client - FIXED IMPORT
-   const mailjet = Mailjet.connect(MAILJET_PUBLIC, MAILJET_PRIVATE);
+  const mailjet = Mailjet.apiConnect(
+  process.env.MAILJET_PUBLIC,
+  process.env.MAILJET_PRIVATE
+);
+
 
     const isApproved = status === "Approved";
 
