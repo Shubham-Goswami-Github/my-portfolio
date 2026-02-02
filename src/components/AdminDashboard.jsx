@@ -16,7 +16,6 @@ import {
   AlertTriangle,
   Loader2,
   Calendar,
-
   Shield
 } from "lucide-react";
 
@@ -250,10 +249,28 @@ const AdminDashboard = () => {
   // Toast State
   const [toast, setToast] = useState({ show: false, message: "", type: "", details: "" });
 
-  // ★★★ FIX: Better API URL configuration ★★★
-  const API_URL = process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/api/sendMail"
-    : "https://myportfoliosg8990.vercel.app/api/sendMail";
+  // ★★★ FIX: Use relative URL for same-origin, absolute for cross-origin ★★★
+  const getApiUrl = () => {
+    // Check if we're in development
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      
+      // If localhost, use local API
+      if (hostname === "localhost" || hostname === "127.0.0.1") {
+        return "/api/sendMail";
+      }
+      
+      // If on Vercel (same domain), use relative URL
+      if (hostname.includes("vercel.app") || hostname.includes("myportfoliosg8990")) {
+        return "/api/sendMail";
+      }
+      
+      // Fallback to absolute URL
+      return "https://myportfoliosg8990.vercel.app/api/sendMail";
+    }
+    
+    return "/api/sendMail";
+  };
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -292,38 +309,68 @@ const AdminDashboard = () => {
     }
   }, [toast.show]);
 
-  // ★★★ FIX: Better sendMail with error handling ★★★
+  // ★★★ FIX: Improved sendMail function with better error handling ★★★
   const sendMail = async (email, name, status) => {
-    console.log("📧 Sending mail:", { email, name, status, API_URL });
+    const API_URL = getApiUrl();
+    console.log("📧 Sending mail request...");
+    console.log("📧 API URL:", API_URL);
+    console.log("📧 Data:", { email, name, status });
     
     try {
-      const response = await axios.post(API_URL, { 
-        email, 
-        name, 
-        status 
-      }, {
-        timeout: 30000, // 30 second timeout
+      const response = await axios({
+        method: 'POST',
+        url: API_URL,
+        data: { 
+          email: email.trim(), 
+          name: name.trim(), 
+          status: status 
+        },
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        timeout: 30000, // 30 second timeout
+        validateStatus: function (status) {
+          return status < 500; // Resolve only if status is less than 500
         }
       });
       
-      console.log("✅ Mail sent successfully:", response.data);
-      return { success: true, data: response.data };
+      console.log("📧 Response status:", response.status);
+      console.log("📧 Response data:", response.data);
+      
+      if (response.status === 200 && response.data.success) {
+        console.log("✅ Mail sent successfully!");
+        return { success: true, data: response.data };
+      } else {
+        // Handle non-success responses
+        const errorMsg = response.data?.error || response.data?.message || `Status: ${response.status}`;
+        console.error("❌ Mail sending failed:", errorMsg);
+        return { success: false, error: errorMsg };
+      }
+      
     } catch (error) {
-      console.error("❌ Mail sending failed:", error);
+      console.error("❌ Mail sending exception:", error);
       
       // Get detailed error message
-      let errorMessage = "Unknown error";
-      if (error.response) {
-        // Server responded with error
-        errorMessage = error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`;
+      let errorMessage = "Unknown error occurred";
+      
+      if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timeout - server took too long to respond";
+      } else if (error.code === "ERR_NETWORK") {
+        errorMessage = "Network error - check your internet connection or API endpoint";
+      } else if (error.response) {
+        // Server responded with error status
+        console.error("❌ Server error response:", error.response.data);
+        errorMessage = error.response.data?.error || 
+                       error.response.data?.message || 
+                       error.response.data?.details ||
+                       `Server error: ${error.response.status}`;
       } else if (error.request) {
-        // Request made but no response
-        errorMessage = "No response from server. Check if API is running.";
+        // Request made but no response received
+        errorMessage = "No response from server. The API might be down or unreachable.";
       } else {
         // Error in setting up request
-        errorMessage = error.message;
+        errorMessage = error.message || "Failed to send request";
       }
       
       return { success: false, error: errorMessage };
@@ -339,7 +386,7 @@ const AdminDashboard = () => {
     setShowConfirmModal(true);
   };
 
-  // ★★★ FIX: Improved handleConfirmAction with better error handling ★★★
+  // ★★★ FIX: Improved handleConfirmAction with proper flow ★★★
   const handleConfirmAction = async () => {
     if (!modalData) return;
     
@@ -350,8 +397,11 @@ const AdminDashboard = () => {
     const newStatus = action === "Approve" ? "Approved" : "Denied";
 
     try {
-      // Step 1: Update Firestore
-      console.log("📝 Updating Firestore...");
+      // Step 1: Update Firestore FIRST
+      console.log("📝 Step 1: Updating Firestore...");
+      console.log("📝 Document ID:", id);
+      console.log("📝 New Status:", newStatus);
+      
       await updateDoc(doc(db, "resume_requests", id), { 
         status: newStatus,
         updatedAt: new Date()
@@ -359,21 +409,23 @@ const AdminDashboard = () => {
       console.log("✅ Firestore updated successfully");
 
       // Step 2: Send Email
-      console.log("📧 Attempting to send email...");
+      console.log("📧 Step 2: Sending email notification...");
       const mailResult = await sendMail(email, name, newStatus);
+      console.log("📧 Mail result:", mailResult);
 
       if (mailResult.success) {
-        // Both succeeded
+        // Both operations succeeded
         setSuccessType(action === "Approve" ? "approve" : "deny");
         setSuccessMessage(
           action === "Approve"
-            ? `Resume approved! Email sent to ${email}`
-            : `Request denied. Notification sent to ${email}`
+            ? `✅ Resume approved!\n\nEmail with resume link sent to:\n${email}`
+            : `❌ Request denied.\n\nNotification sent to:\n${email}`
         );
-        showToast(`${action}d request for ${name}`, "success");
+        showToast(`Successfully ${action.toLowerCase()}d request for ${name}`, "success");
         setShowSuccessModal(true);
       } else {
         // Firestore updated but email failed
+        console.warn("⚠️ Status updated but email failed:", mailResult.error);
         showToast(
           `Status updated but email failed`, 
           "warning", 
@@ -381,7 +433,7 @@ const AdminDashboard = () => {
         );
         setSuccessType(action === "Approve" ? "approve" : "deny");
         setSuccessMessage(
-          `Status updated to ${newStatus}, but email notification failed. You may need to contact ${email} manually.\n\nError: ${mailResult.error}`
+          `⚠️ Status updated to "${newStatus}"\n\nHowever, email notification failed.\n\nError: ${mailResult.error}\n\nYou may need to contact ${email} manually.`
         );
         setShowSuccessModal(true);
       }
@@ -394,7 +446,13 @@ const AdminDashboard = () => {
       let errorDetails = "";
       
       if (error.code) {
-        errorDetails = `Firebase Error: ${error.code} - ${error.message}`;
+        // Firebase error
+        errorDetails = `Firebase Error: ${error.code}`;
+        if (error.code === "permission-denied") {
+          errorDetails = "Permission denied. Check Firebase rules.";
+        } else if (error.code === "not-found") {
+          errorDetails = "Document not found. It may have been deleted.";
+        }
       } else if (error.message) {
         errorDetails = error.message;
       }
@@ -417,14 +475,18 @@ const AdminDashboard = () => {
 
   const formatDate = (timestamp) => {
     if (!timestamp) return "No date";
-    const date = timestamp.toDate?.() || new Date(timestamp);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      const date = timestamp.toDate?.() || new Date(timestamp);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return "Invalid date";
+    }
   };
 
   return (
