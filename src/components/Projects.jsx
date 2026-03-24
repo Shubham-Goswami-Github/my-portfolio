@@ -274,11 +274,10 @@ const projects = [
     accentColor: "#06B6D4",
     accentGradient: "from-cyan-500 to-blue-600",
     image:
-      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/ecomnew.png",
-    github: "https://github.com/Shubham-Goswami-Github/universal-ecommerce",
-    demo: "#",
-    readme:
-      "https://raw.githubusercontent.com/Shubham-Goswami-Github/universal-ecommerce/main/README.md",
+      "https://raw.githubusercontent.com/Shubham-Goswami-Github/portfolio-images/main/ecomhome.png",
+    github: "https://github.com/Shubham-Goswami-Github/universal_ecommerce/tree/main",
+    demo: "https://universal-ecommerce-org.vercel.app/",
+   readme: "https://raw.githubusercontent.com/Shubham-Goswami-Github/universal_ecommerce/main/README.md",
   },
   {
     title: "Evoting System",
