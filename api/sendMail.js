@@ -1,7 +1,7 @@
 const Mailjet = require("node-mailjet");
 
 const RESUME_URL =
-  "https://drive.google.com/file/d/1t2OyqQyQj5Aq0HWwgjVFytAXPq1XTTak/view?usp=drive_link";
+  "https://drive.google.com/file/d/16eQTjqfgZs0pZkZGcGNxB9QcFOzXOufg/view?usp=sharing";
 
 const SENDER_EMAIL = process.env.MAILJET_SENDER_EMAIL || "qis2k2535@gmail.com";
 const SENDER_NAME = process.env.MAILJET_SENDER_NAME || "Shubham Das Goswami";
