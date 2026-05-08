@@ -250,15 +250,13 @@ const AdminDashboard = () => {
 
   // ★★★ FIX: Better API URL configuration ★★★
   const getApiUrl = () => {
-    // Check if running on localhost
-    if (typeof window !== "undefined") {
-      const hostname = window.location.hostname;
-      if (hostname === "localhost" || hostname === "127.0.0.1") {
-        return "http://localhost:3000/api/sendMail";
-      }
+    const configuredUrl = process.env.REACT_APP_MAIL_API_URL;
+
+    if (configuredUrl) {
+      return configuredUrl;
     }
-    // Production URL - UPDATE THIS TO YOUR VERCEL URL
-    return "/api/sendMail"; // Relative URL works on same domain
+
+    return "/api/sendMail";
   };
 
   const API_URL = getApiUrl();
@@ -350,6 +348,10 @@ const AdminDashboard = () => {
         console.error("❌ Server Error Response:", error.response.data);
         errorMessage = error.response.data?.error || `Server error: ${error.response.status}`;
         errorDetails = error.response.data?.details;
+
+        if (error.response.status === 404) {
+          errorMessage = `Mail API endpoint not found at ${API_URL}. Redeploy Vercel with root vercel.json, or set REACT_APP_MAIL_API_URL to your deployed API URL while testing locally.`;
+        }
 
         // Check for specific Mailjet errors
         if (error.response.data?.hint) {
